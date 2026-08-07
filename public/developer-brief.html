@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bodaboda Management System — Developer Brief</title>
+  <style>
+    /* ── Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:  #059669;
+      --green-light: #d1fae5;
+      --green-dark:  #065f46;
+      --slate:  #1e293b;
+      --slate-mid: #475569;
+      --slate-light: #94a3b8;
+      --slate-bg: #f8fafc;
+      --border:  #e2e8f0;
+      --red:    #dc2626;
+      --red-light: #fee2e2;
+      --blue:   #2563eb;
+      --blue-light: #dbeafe;
+      --amber:  #d97706;
+      --amber-light: #fef3c7;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: var(--slate);
+      background: #fff;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 40px;
+    }
+
+    /* ── Print button ── */
+    .print-btn {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .print-btn:hover { background: var(--green-dark); }
+
+    /* ── Cover ── */
+    .cover {
+      text-align: center;
+      padding: 48px 0 40px;
+      border-bottom: 3px solid var(--green);
+      margin-bottom: 40px;
+    }
+    .cover .emblem {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: var(--slate-bg);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+    }
+    .cover h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--slate);
+      letter-spacing: -.5px;
+    }
+    .cover .subtitle {
+      font-size: 15px;
+      color: var(--slate-mid);
+      margin-top: 6px;
+    }
+    .cover .meta {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .cover .meta span {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--slate-mid);
+      background: var(--slate-bg);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 99px;
+    }
+
+    /* ── TOC ── */
+    .toc {
+      background: var(--slate-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px 28px;
+      margin-bottom: 40px;
+    }
+    .toc h2 {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--slate-mid);
+      margin-bottom: 14px;
+    }
+    .toc ol {
+      columns: 2;
+      column-gap: 32px;
+      list-style: decimal;
+      padding-left: 20px;
+    }
+    .toc li {
+      font-size: 13px;
+      color: var(--slate);
+      margin-bottom: 5px;
+      break-inside: avoid;
+    }
+    .toc a { color: var(--green); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* ── Sections ── */
+    h2.section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--slate);
+      margin: 44px 0 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--green);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h2.section-title .num {
+      background: var(--green);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--slate);
+      margin: 24px 0 10px;
+    }
+    h4 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--slate-mid);
+      margin: 16px 0 8px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    p { margin-bottom: 10px; }
+
+    /* ── Callout boxes ── */
+    .callout {
+      border-left: 4px solid var(--green);
+      background: var(--green-light);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 13px;
+    }
+    .callout.warning {
+      border-color: var(--amber);
+      background: var(--amber-light);
+    }
+    .callout.info {
+      border-color: var(--blue);
+      background: var(--blue-light);
+    }
+    .callout strong { display: block; margin-bottom: 4px; }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    thead tr { background: var(--slate); color: #fff; }
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    tbody tr:nth-child(even) { background: var(--slate-bg); }
+    tbody td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tbody tr:hover { background: var(--green-light); }
+
+    /* ── Code / schema blocks ── */
+    .schema-block {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 12px 0;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 11.5px;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+    .schema-block .comment { color: #64748b; }
+    .schema-block .field { color: #7dd3fc; }
+    .schema-block .type { color: #86efac; }
+    .schema-block .constraint { color: #fbbf24; }
+    .schema-block .table-name { color: #f9a8d4; font-weight: 700; }
+
+    /* ── Steps ── */
+    .steps { list-style: none; padding: 0; margin: 12px 0; }
+    .steps li {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+      align-items: flex-start;
+      font-size: 13px;
+    }
+    .steps li .step-num {
+      background: var(--green);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    /* ── Role cards ── */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .role-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      background: var(--slate-bg);
+    }
+    .role-card .role-name {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--slate);
+      margin-bottom: 4px;
+    }
+    .role-card .role-desc {
+      font-size: 12px;
+      color: var(--slate-mid);
+      line-height: 1.5;
+    }
+    .role-card .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      margin-bottom: 6px;
+    }
+    .badge-green { background: var(--green-light); color: var(--green-dark); }
+    .badge-blue  { background: var(--blue-light);  color: var(--blue); }
+    .badge-amber { background: var(--amber-light); color: var(--amber); }
+    .badge-red   { background: var(--red-light);   color: var(--red); }
+    .badge-slate { background: var(--border);      color: var(--slate-mid); }
+
+    /* ── Feature list ── */
+    .feature-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12.5px;
+    }
+    .feature-item::before {
+      content: '✓';
+      color: var(--green);
+      font-weight: 800;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Permission matrix ── */
+    .perm-matrix td { text-align: center; }
+    .perm-matrix td:first-child { text-align: left; font-weight: 600; }
+    .yes { color: var(--green); font-weight: 700; }
+    .no  { color: var(--slate-light); }
+
+    /* ── Stack pills ── */
+    .stack-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .pill {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: var(--slate-bg);
+      color: var(--slate);
+    }
+
+    /* ── Payment amounts ── */
+    .fee-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 8px 0;
+    }
+    .fee-row .label { font-weight: 600; font-size: 13px; }
+    .fee-row .amount { font-size: 18px; font-weight: 800; color: var(--green); }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 11.5px;
+      color: var(--slate-light);
+      text-align: center;
+    }
+
+    /* ── Print styles ── */
+    @media print {
+      .print-btn { display: none !important; }
+      body { padding: 20px 28px; font-size: 11.5px; }
+      h2.section-title { page-break-before: auto; margin-top: 28px; }
+      .schema-block { font-size: 10px; }
+      table { font-size: 11px; }
+      .feature-list { grid-template-columns: 1fr 1fr; }
+      .role-grid { grid-template-columns: 1fr 1fr 1fr; }
+      .callout { page-break-inside: avoid; }
+      .toc { page-break-after: always; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">
+  &#128438; Save as PDF
+</button>
+
+<!-- ═══════════════════════════════════════════════════ COVER -->
+<div class="cover">
+  <div class="emblem">🏍️</div>
+  <h1>Bodaboda Management System</h1>
+  <p class="subtitle">Full-Stack Developer Brief — BMS v1.0</p>
+  <div class="meta">
+    <span>Kenya County Authority</span>
+    <span>React + TypeScript + Supabase</span>
+    <span>Prepared June 2026</span>
+    <span>Confidential</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ TOC -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#overview">System Overview</a></li>
+    <li><a href="#stack">Tech Stack</a></li>
+    <li><a href="#roles">User Roles &amp; Permissions</a></li>
+    <li><a href="#schema">Database Schema</a></li>
+    <li><a href="#auth">Authentication</a></li>
+    <li><a href="#owner-reg">Owner Registration Flow</a></li>
+    <li><a href="#rider-reg">Rider Registration Flow</a></li>
+    <li><a href="#payments">Payment System</a></li>
+    <li><a href="#owner-dashboard">Owner Dashboard</a></li>
+    <li><a href="#rider-dashboard">Rider Dashboard</a></li>
+    <li><a href="#admin">Admin Dashboard</a></li>
+    <li><a href="#verification">Public Verification Page</a></li>
+    <li><a href="#incidents">Incident Management</a></li>
+    <li><a href="#bms-card">BMS ID Card</a></li>
+    <li><a href="#tracking">GPS Tracking (Raidar)</a></li>
+    <li><a href="#storage">File Storage</a></li>
+    <li><a href="#rls">Row Level Security</a></li>
+    <li><a href="#ui">UI &amp; Design Conventions</a></li>
+  </ol>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ 1. OVERVIEW -->
+<h2 class="section-title" id="overview"><span class="num">1</span> System Overview</h2>
+
+<p>The <strong>Bodaboda Management System (BMS)</strong> is a web platform commissioned by a Kenyan county authority to register, verify, and manage motorcycle taxis (bodabodas). It provides end-to-end workflows for motorcycle owner registration, rider onboarding, annual fee collection, public verification, incident reporting, and administrative oversight — all backed by a Supabase PostgreSQL database with Row Level Security.</p>
+
+<div class="callout">
+  <strong>Core Purpose</strong>
+  Replace paper-based bodaboda registration with a digitised, searchable, QR-verified system. Every registered motorcycle is assigned a QR code and every rider receives a printable BMS ID card.
+</div>
+
+<h3>High-Level Architecture</h3>
+<div class="feature-list">
+  <div class="feature-item">Single-page React app (Vite)</div>
+  <div class="feature-item">Supabase backend (DB + Storage)</div>
+  <div class="feature-item">Row Level Security on all tables</div>
+  <div class="feature-item">OTP phone verification at registration</div>
+  <div class="feature-item">QR code verification (public, no login)</div>
+  <div class="feature-item">Printable digital ID card (PDF)</div>
+  <div class="feature-item">Three payment gateways</div>
+  <div class="feature-item">Role-based admin access control</div>
+  <div class="feature-item">Full audit trail for all admin actions</div>
+  <div class="feature-item">OCR auto-fill from ID document photos</div>
+  <div class="feature-item">GPS tracking integration (separate service)</div>
+  <div class="feature-item">Incident reporting and appeals</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ 2. STACK -->
+<h2 class="section-title" id="stack"><span class="num">2</span> Tech Stack</h2>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Frontend framework</td><td>React 18 + TypeScript</td><td>UI, component state</td></tr>
+      <tr><td>Build tool</td><td>Vite</td><td>Dev server, bundling</td></tr>
+      <tr><td>Styling</td><td>Tailwind CSS 3</td><td>Utility-first CSS</td></tr>
+      <tr><td>Icons</td><td>Lucide React</td><td>All UI icons</td></tr>
+      <tr><td>Database / Auth</td><td>Supabase (PostgreSQL)</td><td>All persistent data, RLS</td></tr>
+      <tr><td>File storage</td><td>Supabase Storage</td><td>Documents, photos</td></tr>
+      <tr><td>Maps</td><td>React-Leaflet + Leaflet.js</td><td>Tracking map, OpenStreetMap tiles</td></tr>
+      <tr><td>QR codes</td><td>qrcode (npm)</td><td>QR generation for verification &amp; BMS card</td></tr>
+      <tr><td>PDF export</td><td>jsPDF + html2canvas</td><td>Downloadable BMS ID card</td></tr>
+      <tr><td>OCR</td><td>Tesseract.js</td><td>Auto-fill from ID document photos</td></tr>
+      <tr><td>Password hashing</td><td>bcryptjs</td><td>Admin account passwords</td></tr>
+      <tr><td>TCP server</td><td>Node.js + ws + Express</td><td>GPRS device protocol (separate Raidar service)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="stack-pills">
+  <span class="pill">React 18</span>
+  <span class="pill">TypeScript 5.5</span>
+  <span class="pill">Vite 5.4</span>
+  <span class="pill">Tailwind 3.4</span>
+  <span class="pill">Supabase JS 2.57</span>
+  <span class="pill">React-Leaflet 4.2</span>
+  <span class="pill">jsPDF 3</span>
+  <span class="pill">Tesseract.js 6</span>
+  <span class="pill">bcryptjs 3</span>
+  <span class="pill">qrcode 1.5</span>
+  <span class="pill">Lucide React 0.344</span>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ 3. ROLES -->
+<h2 class="section-title" id="roles"><span class="num">3</span> User Roles &amp; Permissions</h2>
+
+<p>The system has two separate authentication systems: <strong>OTP-based sessions</strong> for owners and riders, and <strong>username/password RBAC</strong> for admin staff.</p>
+
+<h3>Public-Facing Roles</h3>
+<div class="role-grid">
+  <div class="role-card">
+    <span class="badge badge-green">Authenticated</span>
+    <div class="role-name">Motorcycle Owner</div>
+    <div class="role-desc">Registers themselves and their bikes. Manages rider assignments. Pays KES 350/year.</div>
+  </div>
+  <div class="role-card">
+    <span class="badge badge-blue">Authenticated</span>
+    <div class="role-name">Rider</div>
+    <div class="role-desc">Registers as a bodaboda rider. Gets assigned to motorcycles. Pays KES 100/year. Receives BMS ID card.</div>
+  </div>
+  <div class="role-card">
+    <span class="badge badge-slate">No login</span>
+    <div class="role-name">Public User</div>
+    <div class="role-desc">Can search and verify any motorcycle or rider registration. Can report incidents. Cannot view masked personal data.</div>
+  </div>
+</div>
+
+<h3>Admin Roles (RBAC)</h3>
+
+<div class="table-wrap">
+  <table class="perm-matrix">
+    <thead>
+      <tr>
+        <th>Role</th>
+        <th>View All</th>
+        <th>Edit All</th>
+        <th>Delete</th>
+        <th>Approve</th>
+        <th>Manage Users</th>
+        <th>Audit Logs</th>
+        <th>Export</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Super Admin</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      <tr><td>Admin</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      <tr><td>Manager</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+      <tr><td>Editor</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+      <tr><td>Viewer</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="callout info">
+  <strong>Default Super Admin Account</strong>
+  Seeded at migration time: username <code>admin</code>, password <code>admin123</code>. Change immediately after first deployment.
+</div>
+
+<p>Accounts lock after repeated failed login attempts (<code>failed_login_attempts</code> + <code>locked_until</code> fields). All admin actions are written to <code>user_activity_logs</code> including IP address and user agent.</p>
+
+
+<!-- ═══════════════════════════════════════════════════ 4. SCHEMA -->
+<h2 class="section-title" id="schema"><span class="num">4</span> Database Schema</h2>
+
+<div class="callout info">
+  <strong>All tables use UUID primary keys, created_at/updated_at timestamps, and have Row Level Security enabled.</strong> See Section 17 for RLS policy patterns.
+</div>
+
+<h3>owners</h3>
+<div class="schema-block">
+<span class="table-name">owners</span>
+<span class="field">id</span>                    <span class="type">uuid</span>         <span class="comment">-- primary key</span>
+<span class="field">full_name</span>             <span class="type">text</span>         <span class="constraint">NOT NULL</span>
+<span class="field">phone_number</span>          <span class="type">text</span>         <span class="constraint">NOT NULL UNIQUE</span>
+<span class="field">national_id</span>           <span class="type">text</span>         <span class="constraint">NOT NULL UNIQUE</span>
+<span class="field">next_of_kin_name</span>      <span class="type">text</span>
+<span class="field">next_of_kin_phone</span>     <span class="type">text</span>
+<span class="field">otp_verified</span>          <span class="type">boolean</span>      <span class="constraint">DEFAULT false</span>
+<span class="field">payment_status</span>        <span class="type">text</span>         <span class="comment">-- 'pending' | 'completed'</span>
+<span class="field">payment_id</span>            <span class="type">uuid</span>         <span class="comment">-- FK → payments.id (latest)</span>
+<span class="field">created_at</span>            <span class="type">timestamptz</span>  <span class="constraint">DEFAULT now()</span>
+<span class="field">updated_at</span>            <span class="type">timestamptz</span>
+</div>
+
+<h3>motorcycles</h3>
+<div class="schema-block">
+<span class="table-name">motorcycles</span>
+<span class="field">id</span>                    <span class="type">uuid</span>
+<span class="field">owner_id</span>              <span class="type">uuid</span>         <span class="comment">-- FK → owners.id</span>
+<span class="field">registration_number</span>   <span class="type">text</span>         <span class="constraint">NOT NULL UNIQUE</span>
+<span class="field">make</span>                  <span class="type">text</span>
+<span class="field">model</span>                 <span class="type">text</span>
+<span class="field">tracking_device_id</span>    <span class="type">text</span>
+<span class="field">insurance_policy_number</span> <span class="type">text</span>
+<span class="field">bike_photo_url</span>        <span class="type">text</span>         <span class="comment">-- Supabase Storage path</span>
+<span class="field">logbook_url</span>           <span class="type">text</span>
+<span class="field">kra_pin_url</span>           <span class="type">text</span>
+<span class="field">insurance_cover_url</span>   <span class="type">text</span>
+<span class="field">status</span>                <span class="type">text</span>         <span class="comment">-- 'pending' | 'verified'</span>
+<span class="field">is_compliant</span>          <span class="type">boolean</span>      <span class="constraint">DEFAULT false</span>
+<span class="field">verified_at</span>           <span class="type">timestamptz</span>
+<span class="field">verified_by</span>           <span class="type">uuid</span>         <span class="comment">-- FK → system_users.id</span>
+</div>
+
+<h3>riders</h3>
+<div class="schema-block">
+<span class="table-name">riders</span>
+<span class="field">id</span>                    <span class="type">uuid</span>
+<span class="field">name</span>                  <span class="type">text</span>         <span class="constraint">NOT NULL</span>
+<span class="field">id_number</span>             <span class="type">text</span>         <span class="constraint">NOT NULL UNIQUE</span>
+<span class="field">phone_number</span>          <span class="type">text</span>
+<span class="field">next_of_kin_name</span>      <span class="type">text</span>
+<span class="field">next_of_kin_phone</span>     <span class="type">text</span>
+<span class="field">county_registration_number</span> <span class="type">text</span>
+<span class="field">sacco_id</span>              <span class="type">text</span>
+<span class="field">stage_name</span>            <span class="type">text</span>
+<span class="field">photo_url</span>             <span class="type">text</span>
+<span class="field">license_url</span>           <span class="type">text</span>
+<span class="field">good_conduct_url</span>      <span class="type">text</span>
+<span class="field">id_copy_url</span>           <span class="type">text</span>
+<span class="field">assignment_status</span>     <span class="type">text</span>         <span class="comment">-- 'Unassigned' | 'Assigned'</span>
+<span class="field">motorcycle_id</span>         <span class="type">uuid</span>         <span class="comment">-- FK → motorcycles.id (nullable)</span>
+<span class="field">owner_id</span>              <span class="type">uuid</span>         <span class="comment">-- FK → owners.id (nullable)</span>
+<span class="field">bms_id</span>                <span class="type">text</span>         <span class="comment">-- unique BMS identifier</span>
+<span class="field">payment_status</span>        <span class="type">text</span>         <span class="comment">-- 'pending' | 'completed'</span>
+<span class="field">payment_id</span>            <span class="type">uuid</span>
+</div>
+
+<h3>payments</h3>
+<div class="schema-block">
+<span class="table-name">payments</span>
+<span class="field">id</span>                    <span class="type">uuid</span>
+<span class="field">user_type</span>             <span class="type">text</span>         <span class="comment">-- 'owner' | 'rider'</span>
+<span class="field">user_id</span>               <span class="type">uuid</span>         <span class="comment">-- references owners.id or riders.id</span>
+<span class="field">amount</span>                <span class="type">numeric</span>
+<span class="field">payment_method</span>        <span class="type">text</span>         <span class="comment">-- 'mpesa' | 'salamapay' | 'ecitizen'</span>
+<span class="field">payment_status</span>        <span class="type">text</span>         <span class="comment">-- 'pending' | 'completed' | 'failed'</span>
+<span class="field">transaction_reference</span> <span class="type">text</span>
+<span class="field">phone_number</span>          <span class="type">text</span>
+<span class="field">payment_year</span>          <span class="type">integer</span>      <span class="comment">-- calendar year the fee covers (e.g. 2026)</span>
+<span class="field">completed_at</span>          <span class="type">timestamptz</span>
+<span class="field">metadata</span>              <span class="type">jsonb</span>        <span class="comment">-- { user_name, initiated_at, ... }</span>
+</div>
+
+<h3>verifications</h3>
+<div class="schema-block">
+<span class="table-name">verifications</span>
+<span class="field">id</span>                    <span class="type">uuid</span>
+<span class="field">owner_id</span>              <span class="type">uuid</span>         <span class="comment">-- FK → owners.id (one record per owner)</span>
+<span class="field">status</span>                <span class="type">text</span>         <span class="comment">-- 'Pending' | 'Verified' | 'Rejected'</span>
+<span class="field">qr_code_data</span>          <span class="type">text</span>         <span class="comment">-- token for /verify/:token URL</span>
+</div>
+
+<h3>rider_history</h3>
+<div class="schema-block">
+<span class="table-name">rider_history</span>
+<span class="comment">-- Immutable audit trail of all motorcycle ↔ rider assignments</span>
+<span class="field">motorcycle_id</span>         <span class="type">uuid</span>
+<span class="field">rider_id</span>              <span class="type">uuid</span>
+<span class="field">owner_id</span>              <span class="type">uuid</span>
+<span class="field">assigned_at</span>           <span class="type">timestamptz</span>
+<span class="field">removed_at</span>            <span class="type">timestamptz</span>  <span class="comment">-- null means currently assigned</span>
+<span class="field">removal_reason</span>        <span class="type">text</span>
+</div>
+
+<h3>assignment_requests</h3>
+<div class="schema-block">
+<span class="table-name">assignment_requests</span>
+<span class="comment">-- Owner sends request to assign rider to a motorcycle</span>
+<span class="field">rider_id</span>              <span class="type">uuid</span>
+<span class="field">motorcycle_id</span>         <span class="type">uuid</span>
+<span class="field">owner_id</span>              <span class="type">uuid</span>
+<span class="field">status</span>                <span class="type">text</span>         <span class="comment">-- 'pending' | 'accepted' | 'rejected'</span>
+<span class="field">previous_motorcycle_id</span> <span class="type">uuid</span>       <span class="comment">-- for bike change requests</span>
+<span class="field">requested_at</span>          <span class="type">timestamptz</span>
+<span class="field">responded_at</span>          <span class="type">timestamptz</span>
+</div>
+
+<h3>incidents &amp; related tables</h3>
+<div class="schema-block">
+<span class="table-name">incidents</span>
+<span class="field">motorcycle_id</span>         <span class="type">uuid</span>         <span class="comment">-- nullable (for unregistered bikes)</span>
+<span class="field">rider_id</span>              <span class="type">uuid</span>         <span class="comment">-- nullable</span>
+<span class="field">owner_id</span>              <span class="type">uuid</span>         <span class="comment">-- nullable</span>
+<span class="field">incident_type</span>         <span class="type">text</span>
+<span class="field">description</span>          <span class="type">text</span>
+<span class="field">incident_date</span>         <span class="type">date</span>
+<span class="field">location</span>             <span class="type">text</span>
+<span class="field">status</span>               <span class="type">text</span>         <span class="comment">-- 'open' | 'under_review' | 'resolved' | 'dismissed'</span>
+<span class="field">reporter_name</span>        <span class="type">text</span>
+<span class="field">reporter_phone</span>       <span class="type">text</span>
+<span class="field">reporter_email</span>       <span class="type">text</span>
+<span class="field">unregistered_bike_details</span> <span class="type">jsonb</span>   <span class="comment">-- reg number, description, color etc.</span>
+<span class="field">admin_notes</span>          <span class="type">text</span>
+<span class="field">admin_response</span>       <span class="type">text</span>
+<span class="field">response_type</span>        <span class="type">text</span>         <span class="comment">-- 'email' | 'sms' | 'phone'</span>
+<span class="field">response_sent_at</span>     <span class="type">timestamptz</span>
+
+<span class="comment">-- Related tables:</span>
+<span class="table-name">incident_evidence</span>    <span class="comment">-- evidence_url, evidence_type, uploaded_by</span>
+<span class="table-name">incident_appeals</span>     <span class="comment">-- rider appeal text + status + admin response</span>
+<span class="table-name">appeal_evidence</span>      <span class="comment">-- files attached to appeals</span>
+<span class="table-name">incident_notifications</span> <span class="comment">-- per-user unread flag (user_type, user_id, is_read)</span>
+<span class="table-name">rider_notifications</span>  <span class="comment">-- general rider inbox (type, title, message, read flag)</span>
+</div>
+
+<h3>Admin / RBAC tables</h3>
+<div class="schema-block">
+<span class="table-name">user_roles</span>           <span class="comment">-- role_name, display_name, permission flags (7 booleans)</span>
+<span class="table-name">system_users</span>         <span class="comment">-- username, email, password_hash (bcrypt), role_id, is_active</span>
+                       <span class="comment">   failed_login_attempts, locked_until</span>
+<span class="table-name">user_groups</span>          <span class="comment">-- group_name, description, default_role_id</span>
+<span class="table-name">user_group_members</span>   <span class="comment">-- user_id, group_id, added_by, added_at</span>
+<span class="table-name">user_activity_logs</span>   <span class="comment">-- user_id, action_type, module, record_id, details</span>
+                       <span class="comment">   ip_address, user_agent, created_at (append-only)</span>
+</div>
+
+<div class="callout">
+  <strong>action_type values</strong> — login, logout, create, update, delete, approve, reject, view, export<br>
+  <strong>module values</strong> — owners, motorcycles, riders, verifications, users, groups, settings, system
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ 5. AUTH -->
+<h2 class="section-title" id="auth"><span class="num">5</span> Authentication</h2>
+
+<h3>Owners &amp; Riders — OTP Phone Verification</h3>
+<p>There is no Supabase Auth for public users. Instead:</p>
+<ol class="steps">
+  <li><span class="step-num">1</span>User submits phone number during registration</li>
+  <li><span class="step-num">2</span>A 6-digit OTP is generated, stored in the <code>otp_codes</code> table, and sent via SMS</li>
+  <li><span class="step-num">3</span>User enters OTP to verify. On success, <code>owners.otp_verified = true</code></li>
+  <li><span class="step-num">4</span>Owner/rider ID is persisted in <code>localStorage</code> to maintain session across page refreshes</li>
+  <li><span class="step-num">5</span>No JWT or token is used — session is purely the UUID stored client-side</li>
+</ol>
+<div class="callout warning">
+  <strong>Security Note</strong>
+  This is a lightweight session model appropriate for a registry system. If stronger authentication is required, integrate Supabase Auth and link <code>auth.uid()</code> to owner/rider records.
+</div>
+
+<h3>Admins — Username + bcrypt</h3>
+<ol class="steps">
+  <li><span class="step-num">1</span>Admin enters username + password on the admin login screen</li>
+  <li><span class="step-num">2</span>Server-side: fetch <code>system_users</code> row, compare with <code>bcrypt.compare()</code></li>
+  <li><span class="step-num">3</span>On success: load role + permissions, write login event to <code>user_activity_logs</code></li>
+  <li><span class="step-num">4</span>Increment <code>failed_login_attempts</code> on failure; set <code>locked_until</code> after threshold</li>
+  <li><span class="step-num">5</span>Admin session held in React state; refreshing the page requires re-login</li>
+</ol>
+
+
+<!-- ═══════════════════════════════════════════════════ 6. OWNER REG -->
+<h2 class="section-title" id="owner-reg"><span class="num">6</span> Owner Registration Flow</h2>
+
+<p>A multi-step form that creates one <code>owners</code> row, one <code>motorcycles</code> row, and one <code>verifications</code> row.</p>
+
+<ol class="steps">
+  <li><span class="step-num">1</span><strong>Personal details:</strong> full name, phone number, national ID, next of kin name and phone</li>
+  <li><span class="step-num">2</span><strong>OTP verification:</strong> SMS OTP sent to phone. Must verify before proceeding</li>
+  <li><span class="step-num">3</span><strong>OCR (optional):</strong> User can upload a photo of their national ID; Tesseract.js extracts name and ID number to auto-fill fields</li>
+  <li><span class="step-num">4</span><strong>Motorcycle details:</strong> registration plate, make, model, tracking device ID (optional), insurance policy number</li>
+  <li><span class="step-num">5</span><strong>Document upload:</strong> bike photo, logbook, KRA PIN certificate, insurance cover. All uploaded to Supabase Storage. Public access enabled for viewing; URLs stored in <code>motorcycles</code> table</li>
+  <li><span class="step-num">6</span><strong>Payment:</strong> KES 350 via M-Pesa, SalamaPay, or eCitizen. See Section 8</li>
+  <li><span class="step-num">7</span><strong>Completion:</strong> Insert owner + motorcycle + verification records. Generate QR code pointing to <code>/verify/{qr_code_data}</code>. Show success screen with QR download</li>
+</ol>
+
+<div class="callout warning">
+  <strong>QR Code Token</strong>
+  <code>qr_code_data</code> is a UUID stored in <code>verifications</code>. The public verification URL is <code>{origin}/verify/{token}</code>. This token is stable and does not encode sensitive data.
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ 7. RIDER REG -->
+<h2 class="section-title" id="rider-reg"><span class="num">7</span> Rider Registration Flow</h2>
+
+<ol class="steps">
+  <li><span class="step-num">1</span><strong>Personal details:</strong> name, national ID number, phone, next of kin</li>
+  <li><span class="step-num">2</span><strong>Professional details:</strong> county registration number, SACCO ID, stage name</li>
+  <li><span class="step-num">3</span><strong>OCR (optional):</strong> ID photo upload for auto-fill via Tesseract.js</li>
+  <li><span class="step-num">4</span><strong>Document upload:</strong> passport photo, driving license, good conduct certificate, ID copy — all to Supabase Storage</li>
+  <li><span class="step-num">5</span><strong>Payment:</strong> KES 100 via M-Pesa, SalamaPay, or eCitizen</li>
+  <li><span class="step-num">6</span><strong>Completion:</strong> Insert rider record with <code>assignment_status = 'Unassigned'</code>. Generate BMS ID</li>
+</ol>
+
+<h3>BMS ID Generation</h3>
+<p>The BMS ID is a unique alphanumeric identifier for the rider (e.g. <code>BMS-2026-00342</code>). It is generated client-side using a counter + year prefix and stored in <code>riders.bms_id</code>. See Section 14 for the ID card format.</p>
+
+
+<!-- ═══════════════════════════════════════════════════ 8. PAYMENTS -->
+<h2 class="section-title" id="payments"><span class="num">8</span> Payment System</h2>
+
+<div class="fee-row">
+  <div>
+    <div class="label">Motorcycle Owner Annual Fee</div>
+    <div style="font-size:12px;color:#64748b;margin-top:2px">Covers January – December of the payment year</div>
+  </div>
+  <div class="amount">KES 350</div>
+</div>
+<div class="fee-row">
+  <div>
+    <div class="label">Rider Annual Fee</div>
+    <div style="font-size:12px;color:#64748b;margin-top:2px">Covers January – December of the payment year</div>
+  </div>
+  <div class="amount">KES 100</div>
+</div>
+
+<div class="callout warning">
+  <strong>Critical: Year-Based, Not Rolling</strong>
+  Fees cover a fixed calendar year (Jan 1 – Dec 31). A fee paid in November 2025 covers only 2025 and expires on January 1, 2026. There is no proration. Payment due logic: <code>MAX(payment_year WHERE status='completed') &lt; currentYear</code>.
+</div>
+
+<h3>Payment Due Detection</h3>
+<p>On dashboard load, query the latest completed payment for the user:</p>
+<div class="schema-block">
+SELECT payment_year FROM payments
+WHERE user_id = $1
+  AND user_type = $2
+  AND payment_status = 'completed'
+ORDER BY payment_year DESC
+LIMIT 1;
+
+<span class="comment">-- If result.payment_year &lt; new Date().getFullYear(), payment is due.</span>
+<span class="comment">-- If no rows returned, payment is due.</span>
+</div>
+
+<h3>Payment Methods</h3>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Method</th><th>Flow</th><th>Transaction Reference Format</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>M-Pesa</strong></td>
+        <td>User enters Kenyan phone number. Receives simulated STK push. Enters M-Pesa PIN to confirm.</td>
+        <td><code>QRS{8-digit timestamp}{4-char random}</code></td>
+      </tr>
+      <tr>
+        <td><strong>SalamaPay</strong></td>
+        <td>Same phone-number flow. Connects to SalamaPay wallet.</td>
+        <td><code>SAL-TXN-{8-digit timestamp}{4-char random}</code></td>
+      </tr>
+      <tr>
+        <td><strong>eCitizen</strong></td>
+        <td>User visits ecitizen.go.ke, pays under Transport &amp; Licensing → Bodaboda Annual Fee, then enters the reference number from eCitizen to confirm.</td>
+        <td>Reference entered by user (validated: 6–20 alphanumeric characters)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Payment Modal States</h3>
+<p>The <code>PaymentModal</code> component has 5 steps: <strong>select</strong> (choose method) → <strong>details</strong> (enter phone/reference) → <strong>processing</strong> (2.5s simulation) → <strong>success</strong> or <strong>failed</strong>.</p>
+
+<p>On success: update <code>payments.payment_status = 'completed'</code>, update <code>owners.payment_status</code> (or riders), set <code>payment_id</code> to the payment UUID.</p>
+
+<h3>UI Behaviour When Payment Is Due</h3>
+<p>The payment card on both Owner and Rider dashboards switches from <strong>emerald green</strong> to <strong>red</strong>, shows an alert triangle with the due year, and displays a "Pay Now — KES {amount}" button that opens the PaymentModal directly.</p>
+
+
+<!-- ═══════════════════════════════════════════════════ 9. OWNER DASHBOARD -->
+<h2 class="section-title" id="owner-dashboard"><span class="num">9</span> Owner Dashboard</h2>
+
+<p>Authenticated via localStorage owner ID. Loads on initial render and refreshes after mutations.</p>
+
+<h3>Sections</h3>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Section</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Payment Status card</td><td>Annual fee status, last payment year, Pay Now button if due</td></tr>
+      <tr><td>Owner Profile</td><td>Editable personal details (name, phone, next of kin)</td></tr>
+      <tr><td>My Motorcycles</td><td>List of bikes with compliance status, document links, expand/collapse</td></tr>
+      <tr><td>QR Code</td><td>Downloadable QR code for each motorcycle linking to public verification page</td></tr>
+      <tr><td>Find a Rider</td><td>Search riders by name or ID. View their history, current assignment, and documents. Send assignment request.</td></tr>
+      <tr><td>Assignment Requests</td><td>Pending requests shown as cards — approve or reject. Approved triggers assignment and rider_history entry.</td></tr>
+      <tr><td>Assigned Riders</td><td>View current riders per motorcycle. Remove rider with a mandatory reason (written to rider_history).</td></tr>
+      <tr><td>Incidents</td><td>List of incident reports against this owner's motorcycles</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ 10. RIDER DASHBOARD -->
+<h2 class="section-title" id="rider-dashboard"><span class="num">10</span> Rider Dashboard</h2>
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Section</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Payment Status card</td><td>Same year-based detection as owner. Red alert + Pay Now if due.</td></tr>
+      <tr><td>Profile</td><td>Editable: phone, SACCO, stage name</td></tr>
+      <tr><td>Documents</td><td>Upload/view license, good conduct, ID copy, photo</td></tr>
+      <tr><td>Current Assignment</td><td>Motorcycle registration, owner name and phone. Request bike change.</td></tr>
+      <tr><td>BMS Card</td><td>View digital BMS ID card. Download as PDF.</td></tr>
+      <tr><td>Assignment Requests</td><td>Incoming requests from owners — accept or decline</td></tr>
+      <tr><td>Work History</td><td>All past motorcycle assignments with dates and removal reasons</td></tr>
+      <tr><td>Incidents</td><td>Incidents involving this rider. File an appeal with supporting evidence.</td></tr>
+      <tr><td>Notifications</td><td>Bell icon with unread count; inbox of system notifications</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ 11. ADMIN DASHBOARD -->
+<h2 class="section-title" id="admin"><span class="num">11</span> Admin Dashboard</h2>
+
+<p>The admin dashboard is a multi-tab interface. The visible tabs and enabled actions depend on the logged-in admin's role permissions.</p>
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Tab</th><th>Content</th><th>Key Actions</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Owners</strong></td>
+        <td>Searchable table of all owners. Payment badge shows actual year-based status (green "Paid 2026" / red "Due — last: 2025").</td>
+        <td>Open full details modal: view motorcycle, assigned rider, documents, payment info, verification status. Approve / reject verification.</td>
+      </tr>
+      <tr>
+        <td><strong>Motorcycles</strong></td>
+        <td>All bikes with registration, tracking device, insurance, compliance, owner name</td>
+        <td>View documents, assign tracking, edit details</td>
+      </tr>
+      <tr>
+        <td><strong>Riders</strong></td>
+        <td>All riders with year-based payment badge, motorcycle assignment, county/SACCO/stage, document links</td>
+        <td>View rider details modal, view documents</td>
+      </tr>
+      <tr>
+        <td><strong>Incidents</strong></td>
+        <td>All incident reports sortable by status, date, type</td>
+        <td>Update status, write admin notes, send response, view evidence, view rider appeals</td>
+      </tr>
+      <tr>
+        <td><strong>Revenue</strong></td>
+        <td>Summary stats: total revenue, total transactions, M-Pesa / SalamaPay / eCitizen counts, owner vs. rider breakdown</td>
+        <td>Searchable transaction table with payment year column. Export to CSV.</td>
+      </tr>
+      <tr>
+        <td><strong>Users</strong></td>
+        <td>System admin user management (Super Admin only)</td>
+        <td>Create, edit, deactivate users. Assign roles.</td>
+      </tr>
+      <tr>
+        <td><strong>Groups</strong></td>
+        <td>User group management</td>
+        <td>Create groups, set default role, manage members</td>
+      </tr>
+      <tr>
+        <td><strong>Audit Log</strong></td>
+        <td>Full log of all admin actions</td>
+        <td>Filter by user, module, action type, date range</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="callout">
+  <strong>Stats Bar</strong>
+  Top of the admin dashboard shows: Total Owners, Total Motorcycles, Total Riders, Pending Verifications, Verified Records, Total Revenue Collected.
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ 12. VERIFICATION -->
+<h2 class="section-title" id="verification"><span class="num">12</span> Public Verification Page</h2>
+
+<p>Accessible at <code>/verify</code> or <code>/verify/:token</code>. No login required. Used by law enforcement, transport inspectors, or the general public.</p>
+
+<h3>Search</h3>
+<p>Accepts either a <strong>motorcycle registration number</strong> or a <strong>rider national ID number</strong>. Returns a full profile card.</p>
+
+<h3>Data Displayed</h3>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Category</th><th>Fields Shown</th><th>Privacy Masking</th></tr></thead>
+    <tbody>
+      <tr><td>Owner</td><td>Full name, phone, national ID, next of kin</td><td>Phone: <code>+254 7XX XXX 789</code>. ID: last 4 digits only.</td></tr>
+      <tr><td>Motorcycle</td><td>Registration, make, model, tracking device ID, insurance number</td><td>None</td></tr>
+      <tr><td>Rider</td><td>Name, ID number, phone, county reg, SACCO, stage, photo</td><td>ID: last 4 digits. Phone masked.</td></tr>
+      <tr><td>Status</td><td>Verified / Pending / Rejected badge</td><td>—</td></tr>
+      <tr><td>Compliance</td><td>Checklist: tracking device, insurance, rider photo, stage name, all docs uploaded</td><td>—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Incident Reporting from Verification Page</h3>
+<p>Anyone viewing a verified motorcycle can click "Report Incident". If the motorcycle is not found in the system, there is a separate form that captures <code>unregistered_bike_details</code> (registration, color, description) along with reporter contact info.</p>
+
+
+<!-- ═══════════════════════════════════════════════════ 13. INCIDENTS -->
+<h2 class="section-title" id="incidents"><span class="num">13</span> Incident Management</h2>
+
+<h3>Incident Lifecycle</h3>
+<ol class="steps">
+  <li><span class="step-num">1</span>Reporter submits incident via public verification page (or admin creates one)</li>
+  <li><span class="step-num">2</span>Incident created with <code>status = 'open'</code>. Notifications sent to affected owner and rider.</li>
+  <li><span class="step-num">3</span>Admin reviews — can add notes, change status to <code>under_review</code>. Can upload evidence.</li>
+  <li><span class="step-num">4</span>Rider can file an appeal: text + evidence files. Appeal status: pending → approved / rejected.</li>
+  <li><span class="step-num">5</span>Admin writes response, marks <code>response_type</code> (email/sms/phone), sets <code>response_sent_at</code>.</li>
+  <li><span class="step-num">6</span>Final status: <code>resolved</code> or <code>dismissed</code>.</li>
+</ol>
+
+<h3>Notification System</h3>
+<p>Two tables handle notifications: <code>incident_notifications</code> (linked to a specific incident, for both owners and riders) and <code>rider_notifications</code> (general purpose inbox for riders with title/message/read flag). Unread count shown in the rider dashboard bell icon.</p>
+
+
+<!-- ═══════════════════════════════════════════════════ 14. BMS CARD -->
+<h2 class="section-title" id="bms-card"><span class="num">14</span> BMS ID Card</h2>
+
+<p>A digital identification card issued to every registered rider. Displayed on-screen and exportable as a PDF.</p>
+
+<h3>Card Contents</h3>
+<div class="feature-list">
+  <div class="feature-item">Government of Kenya emblem (top left)</div>
+  <div class="feature-item">BMS ID number (e.g. BMS-2026-00342)</div>
+  <div class="feature-item">Rider name and passport photo</div>
+  <div class="feature-item">National ID number</div>
+  <div class="feature-item">Phone number</div>
+  <div class="feature-item">County registration number</div>
+  <div class="feature-item">QR code (encodes <code>BMS:ID|ID:&lt;num&gt;|NAME:&lt;name&gt;</code>)</div>
+  <div class="feature-item">Issue year</div>
+</div>
+
+<h3>PDF Export</h3>
+<p>Uses <code>html2canvas</code> to render the card component to a canvas, then <code>jsPDF</code> to embed the canvas as a page image. The card dimensions follow the standard ID card aspect ratio (85.6mm × 54mm / 1.586:1).</p>
+
+
+<!-- ═══════════════════════════════════════════════════ 15. TRACKING -->
+<h2 class="section-title" id="tracking"><span class="num">15</span> GPS Tracking — Raidar Integration</h2>
+
+<div class="callout info">
+  <strong>Separate Service</strong>
+  GPS tracking is handled by a standalone project called Raidar. It has its own Supabase instance and Node.js backend. The BMS frontend embeds a read-only tracking modal that connects to the Raidar API.
+</div>
+
+<h3>Raidar Features</h3>
+<div class="feature-list">
+  <div class="feature-item">Real-time GPS position on Leaflet map</div>
+  <div class="feature-item">Historical route playback</div>
+  <div class="feature-item">Geofence creation and entry/exit detection</div>
+  <div class="feature-item">JT/T 808-2019 GPRS protocol over TCP</div>
+  <div class="feature-item">Device alarm management</div>
+  <div class="feature-item">REST API with API key authentication</div>
+  <div class="feature-item">Webhook support for events</div>
+  <div class="feature-item">Rate limiting and usage analytics</div>
+</div>
+
+<h3>Raidar Database Tables (separate instance)</h3>
+<p><code>tracking_devices</code>, <code>device_locations</code> (partitioned by time), <code>device_alarms</code>, <code>geofences</code>, <code>device_commands</code>, <code>api_clients</code>, <code>api_usage_logs</code>, <code>device_connections</code>, <code>vehicles</code>. PostGIS extension enabled for spatial queries.</p>
+
+<h3>Integration in BMS</h3>
+<p>The <code>TrackingModal</code> component in the admin/owner dashboard fetches live position from the Raidar REST API at <code>http://localhost:3000/api</code> (configurable). The motorcycle's <code>tracking_device_id</code> is the link key between the two systems.</p>
+
+
+<!-- ═══════════════════════════════════════════════════ 16. STORAGE -->
+<h2 class="section-title" id="storage"><span class="num">16</span> File Storage</h2>
+
+<p>All user-uploaded files are stored in Supabase Storage. Public access is enabled for viewing (no token required for reading). Write access requires the uploading user's session.</p>
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Bucket / Path Pattern</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td><code>motorcycles/{motorcycle_id}/bike-photo</code></td><td>Motorcycle photo</td></tr>
+      <tr><td><code>motorcycles/{motorcycle_id}/logbook</code></td><td>Logbook document</td></tr>
+      <tr><td><code>motorcycles/{motorcycle_id}/kra-pin</code></td><td>KRA PIN certificate</td></tr>
+      <tr><td><code>motorcycles/{motorcycle_id}/insurance-cover</code></td><td>Insurance cover document</td></tr>
+      <tr><td><code>riders/{rider_id}/photo</code></td><td>Passport-style photo</td></tr>
+      <tr><td><code>riders/{rider_id}/license</code></td><td>Driving license</td></tr>
+      <tr><td><code>riders/{rider_id}/good-conduct</code></td><td>Good conduct certificate</td></tr>
+      <tr><td><code>riders/{rider_id}/id-copy</code></td><td>National ID copy</td></tr>
+      <tr><td><code>incidents/{incident_id}/evidence</code></td><td>Incident evidence files</td></tr>
+      <tr><td><code>appeals/{appeal_id}/evidence</code></td><td>Appeal supporting documents</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ 17. RLS -->
+<h2 class="section-title" id="rls"><span class="num">17</span> Row Level Security</h2>
+
+<p>Every table has <code>ALTER TABLE ... ENABLE ROW LEVEL SECURITY</code>. Policies are written per-operation (SELECT / INSERT / UPDATE / DELETE).</p>
+
+<div class="callout warning">
+  <strong>Important Pattern</strong>
+  Because owners and riders authenticate via OTP (not Supabase Auth), RLS policies for their tables use <code>TO anon</code> with permissive rules rather than <code>auth.uid()</code>. Sensitive filtering is done in application code. For production hardening, link owners/riders to Supabase Auth UIDs.
+</div>
+
+<h3>Admin Table Policies</h3>
+<p>Admin tables (<code>system_users</code>, <code>user_roles</code>, <code>user_activity_logs</code>) are restricted to <code>authenticated</code> role or service role key only. Never expose these via the anon key.</p>
+
+<h3>Public Read Tables</h3>
+<p><code>verifications</code>, <code>motorcycles</code> (registration/status fields only), <code>riders</code> (non-sensitive fields), <code>rider_history</code> — these support <code>FOR SELECT TO anon USING (true)</code> to power the public verification page.</p>
+
+
+<!-- ═══════════════════════════════════════════════════ 18. UI -->
+<h2 class="section-title" id="ui"><span class="num">18</span> UI &amp; Design Conventions</h2>
+
+<h3>Branding</h3>
+<p>Government of Kenya emblem (<code>public/government-of-kenya-emblem-gok-logo-png_seeklogo-318197 (1).png</code>) shown in the landing page header and on the BMS ID card. Primary brand colour is <strong>emerald green</strong> (<code>#059669</code>). No purple or violet tones.</p>
+
+<h3>Colour Semantics</h3>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Colour</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td>Emerald green</td><td>Primary actions, paid status, verified status, success states</td></tr>
+      <tr><td>Red</td><td>Payment due, errors, failed state, dangerous actions</td></tr>
+      <tr><td>Amber</td><td>Pending/warning states</td></tr>
+      <tr><td>Blue</td><td>SalamaPay, informational callouts, rider-type badges</td></tr>
+      <tr><td>Slate</td><td>All neutral text, backgrounds, borders</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Layout Conventions</h3>
+<div class="feature-list">
+  <div class="feature-item">Max content width: <code>max-w-6xl mx-auto</code></div>
+  <div class="feature-item">Card radius: <code>rounded-xl</code> (12px)</div>
+  <div class="feature-item">8px base spacing unit</div>
+  <div class="feature-item">Modals: fixed inset, dark backdrop</div>
+  <div class="feature-item">Tables: zebra stripe, hover highlight</div>
+  <div class="feature-item">Gradient cards for key stats (emerald or red)</div>
+  <div class="feature-item">Lucide React for all iconography</div>
+  <div class="feature-item">Mobile-responsive at all breakpoints</div>
+</div>
+
+<h3>Navigation Flow</h3>
+<div class="schema-block">
+LandingPage
+├── Register as Owner → RegistrationChoice → RegistrationForm → PaymentModal → RegistrationSuccess
+├── Register as Rider → RiderRegistration → PaymentModal → RegistrationSuccess
+├── Owner Login (phone + OTP) → UserDashboard
+├── Rider Login (ID number) → RiderDashboard
+├── Verify Motorcycle → VerificationPage (public)
+└── Admin Login → AdminDashboard
+    ├── Tabs: Owners | Motorcycles | Riders | Incidents | Revenue | Users | Groups | Audit
+    └── Modals: Full Details | Tracking | User Form | Group Form | Incident Details
+</div>
+
+<footer>
+  Bodaboda Management System — Developer Brief &nbsp;|&nbsp; Confidential &nbsp;|&nbsp; Prepared June 2026<br>
+  Built with React 18 + TypeScript + Supabase
+</footer>
+
+</body>
+</html>

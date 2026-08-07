@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "name": "Raidar Police",
+    "slug": "raidar-police",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "raidarpolice",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F172A"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ke.raidar.police",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Raidar Police uses the camera to scan rider QR codes and capture documents for validation.",
+        "NSLocationWhenInUseUsageDescription": "Raidar Police tags fines and incident reports with your current location.",
+        "NSPhotoLibraryUsageDescription": "Raidar Police uses the photo library to attach evidence to reports.",
+        "NSFaceIDUsageDescription": "Use Face ID to unlock Raidar Police."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0F172A"
+      },
+      "package": "ke.raidar.police",
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Raidar Police uses the camera to scan QR codes and documents."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Raidar Police tags reports with location."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Use Face ID to unlock Raidar Police."
+        }
+      ]
+    ],
+    "extra": {
+      "supabaseUrl": "https://aydvtcllqozxvowjtpxd.supabase.co",
+      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5ZHZ0Y2xscW96eHZvd2p0cHhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0ODg1MTksImV4cCI6MjA3ODA2NDUxOX0.ogtHmjP8-n8nRqCPOLLYgVl0QJyathPHwNrclS-Gn28"
+    }
+  }
+}
