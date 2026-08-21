@@ -97,6 +97,10 @@ export class DeviceManager {
           return;
         }
       }
+      if (device.device_id !== device.phone_number) {
+        await this.dbService.fixDeviceId(device.id, device.phone_number);
+        device.device_id = device.phone_number;
+      }
       await this.dbService.updateDeviceStatus(device.device_id, 'online');
       session.deviceId = device.device_id;
 

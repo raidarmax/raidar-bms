@@ -188,6 +188,17 @@ export class DatabaseService {
     return data;
   }
 
+  async fixDeviceId(id: string, correctDeviceId: string) {
+    await this.supabase
+      .from('tracking_devices')
+      .update({ device_id: correctDeviceId })
+      .eq('id', id);
+    await this.supabase
+      .from('motorcycles')
+      .update({ tracking_device_id: correctDeviceId })
+      .eq('tracking_device_id', id);
+  }
+
   async getDeviceById(deviceId: string) {
     const { data, error } = await this.supabase
       .from('tracking_devices')
