@@ -1,0 +1,616 @@
+import React, { useMemo, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  StatusBar,
+  TextInput,
+  Platform,
+} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import { colors, spacing, borderRadius } from '../../theme';
+import {
+  BookOpenIcon,
+  ChevronDownIcon,
+  SearchIcon,
+  HomeIcon,
+  QrCodeIcon,
+  AlertTriangleIcon,
+  ReceiptIcon,
+  ShieldCheckIcon,
+  UsersIcon,
+  ActivityIcon,
+  UserIcon,
+  HelpCircleIcon,
+} from '../../components/icons/Icons';
+
+type Topic = {
+  key: string;
+  title: string;
+  summary: string;
+  color: string;
+  icon: (color: string) => React.ReactNode;
+  steps: { title: string; body: string }[];
+};
+
+const TOPICS: Topic[] = [
+  {
+    key: 'home',
+    title: 'Home dashboard',
+    summary: 'Your daily view of incidents, cases, fines and verifications.',
+    color: colors.brand[600],
+    icon: (c) => <HomeIcon size={22} color={c} strokeWidth={2.6} />,
+    steps: [
+      {
+        title: 'Read the four glance cards',
+        body:
+          'The colored cards at the top show new incidents, active cases, fines issued today, and fines issued this month. Tap any card to jump to the full list for that item.',
+      },
+      {
+        title: 'Use the quick actions',
+        body:
+          'The green tiles under your greeting let you verify documents, search a person or plate, issue a fine, or report an incident with one tap.',
+      },
+      {
+        title: 'Check verifications today',
+        body:
+          'The wide mint card at the bottom shows how many documents you have verified today. Tap it to open the verification screen and start another check.',
+      },
+      {
+        title: 'Refresh live numbers',
+        body:
+          'Pull the page down to refresh. All counts come straight from headquarters and update the moment new events are recorded.',
+      },
+    ],
+  },
+  {
+    key: 'scan',
+    title: 'Scanning QR codes',
+    summary: 'Instantly pull a rider profile or motorcycle record from a plate or ID.',
+    color: '#0FBF8F',
+    icon: (c) => <QrCodeIcon size={22} color={c} strokeWidth={2.6} />,
+    steps: [
+      {
+        title: 'Open the scanner',
+        body:
+          'Tap the green Scan button in the middle of the bottom bar. Point your phone camera at the QR code on a rider ID card, sticker, or dashboard sheet.',
+      },
+      {
+        title: 'Hold steady until the frame turns green',
+        body:
+          'The scanner reads BMS-issued codes and standard QR codes. Keep the code inside the guide box until you feel a short vibration.',
+      },
+      {
+        title: 'Review the result page',
+        body:
+          'You will see the linked rider, their motorcycle, license status, and any open fines or incidents. From there you can verify, issue a fine, or open a case.',
+      },
+      {
+        title: 'When the code will not read',
+        body:
+          'Move to better light and clean the camera lens. If the QR is torn, tap Search in the drawer and look the rider up by name, phone number, or number plate.',
+      },
+    ],
+  },
+  {
+    key: 'incidents',
+    title: 'Incidents',
+    summary: 'Log accidents, thefts, and other events tied to a rider or bike.',
+    color: colors.rose[600],
+    icon: (c) => <AlertTriangleIcon size={22} color={c} strokeWidth={2.6} />,
+    steps: [
+      {
+        title: 'See what is new',
+        body:
+          'The incidents list is sorted with the newest at the top. A red dot marks incidents that still need to be handled by an officer.',
+      },
+      {
+        title: 'Open an incident',
+        body:
+          'Tap a row to see the parties involved, the location on a map, photos and any notes. You can add your own notes, attach evidence photos, and mark the case status.',
+      },
+      {
+        title: 'File a new report',
+        body:
+          'Use Report an Incident from the Home screen. Pick the type, tag the rider or plate if known, drop the location pin, and add a short description. Photos are optional but help investigations.',
+      },
+      {
+        title: 'Resolve or escalate',
+        body:
+          'When the situation is handled, mark the incident resolved and add a summary. If it needs a court process, escalate it and a case number is generated for you.',
+      },
+    ],
+  },
+  {
+    key: 'fines',
+    title: 'Fines',
+    summary: 'Issue traffic fines and review your history.',
+    color: colors.amber[600],
+    icon: (c) => <ReceiptIcon size={22} color={c} strokeWidth={2.6} />,
+    steps: [
+      {
+        title: 'Issue a new fine',
+        body:
+          'Tap Issue Fine on Home or the plus button on the fines list. Search the rider or scan their QR, pick the offence from the list, and the amount fills in automatically.',
+      },
+      {
+        title: 'Check payment status',
+        body:
+          'Each fine shows Pending, Paid, or Overdue. The receipt number is generated by the system and sent to the rider by SMS the moment you save the fine.',
+      },
+      {
+        title: 'Correct a mistake',
+        body:
+          'You have fifteen minutes to void a fine you issued in error. Open the fine, tap the menu in the top right, and choose Void with a reason. After that window it needs a supervisor.',
+      },
+      {
+        title: 'Export or share',
+        body:
+          'From any fine detail, tap Share to send the receipt PDF to the rider or to a colleague on WhatsApp or email.',
+      },
+    ],
+  },
+  {
+    key: 'verify',
+    title: 'Verify documents',
+    summary: 'Confirm that a license, insurance sticker, or NTSA record is genuine.',
+    color: colors.teal[600],
+    icon: (c) => <ShieldCheckIcon size={22} color={c} strokeWidth={2.6} />,
+    steps: [
+      {
+        title: 'Choose what to verify',
+        body:
+          'Open Verify Documents from the Home tiles or the side menu. Pick Driving License, Insurance, or Motorcycle Registration.',
+      },
+      {
+        title: 'Scan or type the reference',
+        body:
+          'Point the camera at the document number, or type it in yourself. The system reads the numbers with the camera to save time.',
+      },
+      {
+        title: 'Read the result badge',
+        body:
+          'Green Verified means the document is valid and matches the rider. Amber Warning means the document expires soon. Red Invalid means it is expired, forged, or does not exist.',
+      },
+      {
+        title: 'Take action from the result',
+        body:
+          'From a red or amber result you can issue a fine, open an incident, or send a reminder SMS with one tap.',
+      },
+    ],
+  },
+  {
+    key: 'search',
+    title: 'Search',
+    summary: 'Find a rider, motorcycle, or case without scanning.',
+    color: colors.blue[600],
+    icon: (c) => <SearchIcon size={22} color={c} strokeWidth={2.6} />,
+    steps: [
+      {
+        title: 'Open search',
+        body:
+          'Tap Search from the Home tiles or the side menu. You can search by rider name, phone number, national ID, number plate, or case number.',
+      },
+      {
+        title: 'Read the suggestions',
+        body:
+          'As you type, the top results appear grouped by type. Riders show a photo, plate, and rating. Cases show status and date.',
+      },
+      {
+        title: 'Open a profile',
+        body:
+          'Tap any result to open the full profile. From a rider you can see their bike history, fines, incidents, and rating. From a case you can jump right into the timeline.',
+      },
+    ],
+  },
+  {
+    key: 'officers',
+    title: 'Officers directory',
+    summary: 'See colleagues at your station and reach them quickly.',
+    color: colors.brand[600],
+    icon: (c) => <UsersIcon size={22} color={c} strokeWidth={2.6} />,
+    steps: [
+      {
+        title: 'Browse your station',
+        body:
+          'The officers screen lists everyone attached to your station with their rank and role. Green dot means on duty right now.',
+      },
+      {
+        title: 'Call or message',
+        body:
+          'Tap an officer to see their contact card. You can call, send an SMS, or share a case with them so it appears in their queue.',
+      },
+    ],
+  },
+  {
+    key: 'activity',
+    title: 'Activity log',
+    summary: 'A record of everything you and your team have done in the app.',
+    color: colors.orange[600],
+    icon: (c) => <ActivityIcon size={22} color={c} strokeWidth={2.6} />,
+    steps: [
+      {
+        title: 'Filter by day or type',
+        body:
+          'Use the filter chips at the top to focus on fines, verifications, incidents, or a specific date. This is your paper trail for supervisors and audits.',
+      },
+      {
+        title: 'Jump into any entry',
+        body:
+          'Tap any log line to open the exact fine, case, or verification it refers to. You can screenshot or share a log entry as evidence of an action taken.',
+      },
+    ],
+  },
+  {
+    key: 'profile',
+    title: 'Your profile & sign out',
+    summary: 'Update your photo, phone, or password, and end your shift safely.',
+    color: colors.gray[700],
+    icon: (c) => <UserIcon size={22} color={c} strokeWidth={2.6} />,
+    steps: [
+      {
+        title: 'Update your details',
+        body:
+          'Open your profile from the top-right avatar or the side menu. You can change your photo, phone number, and email. Your rank and station are set by headquarters.',
+      },
+      {
+        title: 'Change your password',
+        body:
+          'Use Change Password inside your profile. You will need your current password. Passwords must be at least eight characters with one number.',
+      },
+      {
+        title: 'Sign out at end of shift',
+        body:
+          'Always sign out from the side menu when you finish. It stops your device from receiving cases meant for on-duty officers and protects rider data if the phone is lost.',
+      },
+    ],
+  },
+];
+
+export default function HelpScreen() {
+  const [query, setQuery] = useState('');
+  const [openKey, setOpenKey] = useState<string | null>('home');
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return TOPICS;
+    return TOPICS.filter((t) => {
+      if (t.title.toLowerCase().includes(q)) return true;
+      if (t.summary.toLowerCase().includes(q)) return true;
+      return t.steps.some(
+        (s) =>
+          s.title.toLowerCase().includes(q) || s.body.toLowerCase().includes(q),
+      );
+    });
+  }, [query]);
+
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.brand[900]} />
+
+      <LinearGradient
+        colors={[colors.brand[800], colors.brand[700]]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.hero}
+      >
+        <View style={styles.heroTop}>
+          <View style={styles.heroBadge}>
+            <BookOpenIcon size={22} color={colors.brand[100]} strokeWidth={2.6} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.heroKicker}>Help centre</Text>
+            <Text style={styles.heroTitle}>How to use the police app</Text>
+          </View>
+        </View>
+        <Text style={styles.heroSub}>
+          Short guides for every part of the app. Tap a topic to expand the steps.
+        </Text>
+
+        <View style={styles.searchBar}>
+          <SearchIcon size={18} color={colors.brand[100]} strokeWidth={2.4} />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search help topics"
+            placeholderTextColor="rgba(200, 230, 219, 0.65)"
+            style={styles.searchInput}
+            returnKeyType="search"
+          />
+        </View>
+      </LinearGradient>
+
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {filtered.length === 0 ? (
+          <View style={styles.emptyState}>
+            <HelpCircleIcon size={32} color={colors.gray[400]} strokeWidth={2} />
+            <Text style={styles.emptyTitle}>No matching topics</Text>
+            <Text style={styles.emptyBody}>
+              Try a shorter phrase, or clear the search to see every guide.
+            </Text>
+          </View>
+        ) : (
+          filtered.map((topic) => {
+            const isOpen = openKey === topic.key;
+            return (
+              <View key={topic.key} style={styles.topicCard}>
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  onPress={() => setOpenKey(isOpen ? null : topic.key)}
+                  style={styles.topicHeader}
+                >
+                  <View style={[styles.topicIcon, { backgroundColor: withAlpha(topic.color, 0.12), borderColor: withAlpha(topic.color, 0.22) }]}>
+                    {topic.icon(topic.color)}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.topicTitle}>{topic.title}</Text>
+                    <Text style={styles.topicSummary} numberOfLines={2}>
+                      {topic.summary}
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.chevWrap,
+                      isOpen && { transform: [{ rotate: '180deg' }] },
+                    ]}
+                  >
+                    <ChevronDownIcon size={18} color={colors.gray[500]} strokeWidth={2.6} />
+                  </View>
+                </TouchableOpacity>
+
+                {isOpen && (
+                  <View style={styles.stepsList}>
+                    {topic.steps.map((step, i) => (
+                      <View key={step.title} style={styles.stepRow}>
+                        <View style={[styles.stepNumber, { backgroundColor: topic.color }]}>
+                          <Text style={styles.stepNumberText}>{i + 1}</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.stepTitle}>{step.title}</Text>
+                          <Text style={styles.stepBody}>{step.body}</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            );
+          })
+        )}
+
+        <View style={styles.contactCard}>
+          <View style={styles.contactIcon}>
+            <HelpCircleIcon size={22} color={colors.brand[700]} strokeWidth={2.4} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.contactTitle}>Still need help?</Text>
+            <Text style={styles.contactBody}>
+              Call the BMS support desk on 0800 720 720 (toll free) or email
+              support@bms.go.ke. Include your officer number so we can track your
+              case.
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+function withAlpha(hex: string, alpha: number) {
+  const clean = hex.replace('#', '');
+  if (clean.length !== 6) return hex;
+  const r = parseInt(clean.substring(0, 2), 16);
+  const g = parseInt(clean.substring(2, 4), 16);
+  const b = parseInt(clean.substring(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.gray[50],
+  },
+  hero: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xl,
+    borderBottomLeftRadius: 22,
+    borderBottomRightRadius: 22,
+  },
+  heroTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  heroBadge: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.10)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroKicker: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.brand[200],
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  heroTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: colors.white,
+    letterSpacing: -0.4,
+    marginTop: 2,
+  },
+  heroSub: {
+    marginTop: spacing.sm,
+    fontSize: 13,
+    lineHeight: 19,
+    color: 'rgba(232, 245, 240, 0.85)',
+  },
+  searchBar: {
+    marginTop: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: 'rgba(255,255,255,0.10)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
+    paddingHorizontal: spacing.md,
+    paddingVertical: Platform.OS === 'ios' ? 12 : 8,
+    borderRadius: borderRadius.lg,
+  },
+  searchInput: {
+    flex: 1,
+    color: colors.white,
+    fontSize: 14,
+    fontWeight: '500',
+    padding: 0,
+  },
+  scroll: { flex: 1 },
+  scrollContent: {
+    padding: spacing.lg,
+    paddingBottom: spacing.xxxxl,
+    gap: spacing.md,
+  },
+  topicCard: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg + 2,
+    borderWidth: 1,
+    borderColor: colors.gray[200],
+    overflow: 'hidden',
+    ...(Platform.OS === 'ios'
+      ? { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 10 }
+      : { elevation: 1 }),
+  },
+  topicHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.md,
+  },
+  topicIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  topicTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.gray[900],
+    letterSpacing: -0.2,
+  },
+  topicSummary: {
+    marginTop: 2,
+    fontSize: 12,
+    lineHeight: 17,
+    color: colors.gray[500],
+  },
+  chevWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.gray[100],
+  },
+  stepsList: {
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
+    paddingTop: spacing.xs,
+    borderTopWidth: 1,
+    borderTopColor: colors.gray[100],
+    gap: spacing.md,
+  },
+  stepRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    paddingTop: spacing.sm,
+  },
+  stepNumber: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 2,
+  },
+  stepNumberText: {
+    color: colors.white,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  stepTitle: {
+    fontSize: 13.5,
+    fontWeight: '700',
+    color: colors.gray[900],
+    letterSpacing: -0.1,
+  },
+  stepBody: {
+    marginTop: 3,
+    fontSize: 13,
+    lineHeight: 19,
+    color: colors.gray[600],
+  },
+  contactCard: {
+    marginTop: spacing.md,
+    flexDirection: 'row',
+    gap: spacing.md,
+    backgroundColor: colors.brand[50],
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: colors.brand[100],
+    padding: spacing.md,
+  },
+  contactIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.brand[100],
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  contactTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.brand[800],
+    letterSpacing: -0.2,
+  },
+  contactBody: {
+    marginTop: 3,
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: colors.brand[800],
+  },
+  emptyState: {
+    alignItems: 'center',
+    padding: spacing.xl,
+    gap: spacing.sm,
+  },
+  emptyTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.gray[700],
+  },
+  emptyBody: {
+    fontSize: 13,
+    color: colors.gray[500],
+    textAlign: 'center',
+    lineHeight: 19,
+  },
+});

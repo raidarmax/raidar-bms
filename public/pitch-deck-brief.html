@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BMS Pitch Deck Brief — Government Presentation</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:       #047857;
+      --green-mid:   #059669;
+      --green-light: #d1fae5;
+      --green-pale:  #f0fdf4;
+      --dark:        #0f172a;
+      --slate:       #1e293b;
+      --mid:         #475569;
+      --muted:       #94a3b8;
+      --border:      #e2e8f0;
+      --bg:          #f8fafc;
+      --red:         #dc2626;
+      --red-light:   #fee2e2;
+      --amber:       #d97706;
+      --amber-light: #fef3c7;
+      --blue:        #1d4ed8;
+      --blue-light:  #dbeafe;
+      --gold:        #b45309;
+      --gold-light:  #fef3c7;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--slate);
+      background: #fff;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 44px;
+    }
+
+    /* Print button */
+    .print-btn {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,.2);
+      z-index: 100;
+    }
+    .print-btn:hover { background: #065f46; }
+
+    /* ── Cover ── */
+    .cover {
+      background: linear-gradient(135deg, var(--dark) 0%, #064e3b 100%);
+      border-radius: 16px;
+      padding: 56px 48px;
+      color: #fff;
+      margin-bottom: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.04);
+    }
+    .cover::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: -30px;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.03);
+    }
+    .cover .tag {
+      display: inline-block;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      color: #a7f3d0;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 99px;
+      margin-bottom: 20px;
+    }
+    .cover h1 {
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -.5px;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    .cover h1 span { color: #6ee7b7; }
+    .cover .subtitle {
+      font-size: 16px;
+      color: rgba(255,255,255,.75);
+      margin-bottom: 28px;
+      max-width: 560px;
+    }
+    .cover .meta-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .cover .meta-pill {
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.85);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 99px;
+    }
+
+    /* ── Section headings ── */
+    h2.sec {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--dark);
+      margin: 52px 0 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    h2.sec .icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: var(--green-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    h2.sec .line {
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, var(--green-mid), transparent);
+      margin-left: 8px;
+    }
+
+    h3 { font-size: 15px; font-weight: 700; color: var(--slate); margin: 24px 0 10px; }
+    h4 { font-size: 13px; font-weight: 700; color: var(--mid); margin: 16px 0 8px; text-transform: uppercase; letter-spacing: .5px; }
+
+    p { margin-bottom: 12px; color: var(--mid); }
+
+    /* ── Problem statement ── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 20px 0;
+    }
+    .problem-card {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--red);
+      border-radius: 0 10px 10px 0;
+      padding: 16px 18px;
+      background: var(--bg);
+    }
+    .problem-card .label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--red);
+      margin-bottom: 6px;
+    }
+    .problem-card .text {
+      font-size: 13px;
+      color: var(--slate);
+      line-height: 1.55;
+    }
+
+    /* ── Stat bar ── */
+    .stat-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 20px 0;
+    }
+    .stat-card {
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 14px;
+      background: var(--bg);
+    }
+    .stat-card .num {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--dark);
+      line-height: 1;
+    }
+    .stat-card .num span { font-size: 16px; color: var(--green-mid); }
+    .stat-card .label { font-size: 11.5px; color: var(--muted); margin-top: 5px; }
+
+    /* ── Feature cards ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .feature-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 18px;
+      background: #fff;
+      transition: box-shadow .2s;
+    }
+    .feature-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+    .feature-card .icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .feature-card .title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+    .feature-card .desc {
+      font-size: 12.5px;
+      color: var(--mid);
+      line-height: 1.55;
+    }
+
+    /* ── Benefit rows ── */
+    .benefit-list { margin: 16px 0; }
+    .benefit-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .benefit-item:last-child { border-bottom: none; }
+    .benefit-item .bullet {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--green-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .benefit-item .content .title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 3px;
+    }
+    .benefit-item .content .body {
+      font-size: 13px;
+      color: var(--mid);
+      line-height: 1.55;
+    }
+    .benefit-item .content .body strong { color: var(--slate); font-weight: 600; }
+
+    /* ── Revenue model cards ── */
+    .revenue-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .revenue-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 20px;
+      background: #fff;
+    }
+    .revenue-card .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .revenue-card .header .icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .revenue-card .header .name {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--dark);
+    }
+    .revenue-card .header .badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+    .revenue-card .amount {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--green);
+      margin: 8px 0 4px;
+    }
+    .revenue-card .desc {
+      font-size: 12.5px;
+      color: var(--mid);
+      line-height: 1.55;
+    }
+    .badge-green { background: var(--green-light); color: var(--green); }
+    .badge-blue  { background: var(--blue-light);  color: var(--blue); }
+    .badge-amber { background: var(--amber-light); color: var(--amber); }
+    .badge-red   { background: var(--red-light);   color: var(--red); }
+
+    /* ── Projection table ── */
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { background: var(--dark); color: #fff; }
+    thead th { padding: 11px 16px; text-align: left; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+    tbody tr:nth-child(even) { background: var(--bg); }
+    tbody td { padding: 10px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .highlight td { background: var(--green-pale) !important; font-weight: 600; color: var(--dark); }
+    .total-row td { background: var(--green) !important; color: #fff !important; font-weight: 700; }
+
+    /* ── Callout boxes ── */
+    .callout {
+      border-left: 4px solid var(--green-mid);
+      background: var(--green-pale);
+      padding: 14px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 13.5px;
+      color: var(--slate);
+    }
+    .callout.warning { border-color: var(--amber); background: var(--amber-light); }
+    .callout.info    { border-color: var(--blue);  background: var(--blue-light); }
+    .callout strong { display: block; font-size: 14px; margin-bottom: 4px; color: var(--dark); }
+
+    /* ── Comparison ── */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .compare-card {
+      border-radius: 12px;
+      padding: 22px;
+    }
+    .compare-card.old {
+      background: var(--red-light);
+      border: 1px solid #fca5a5;
+    }
+    .compare-card.new {
+      background: var(--green-pale);
+      border: 1px solid #6ee7b7;
+    }
+    .compare-card .label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .compare-card.old .label { color: var(--red); }
+    .compare-card.new .label { color: var(--green); }
+    .compare-card ul { list-style: none; padding: 0; }
+    .compare-card ul li {
+      font-size: 13px;
+      padding: 5px 0;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      color: var(--slate);
+    }
+    .compare-card ul li::before { flex-shrink: 0; }
+    .compare-card.old ul li::before { content: '✕'; color: var(--red); font-weight: 700; }
+    .compare-card.new ul li::before { content: '✓'; color: var(--green); font-weight: 700; }
+
+    /* ── Roadmap ── */
+    .roadmap {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      margin: 20px 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .roadmap-phase {
+      padding: 22px 20px;
+      border-right: 1px solid var(--border);
+    }
+    .roadmap-phase:last-child { border-right: none; }
+    .roadmap-phase .phase-label {
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--green-mid);
+      margin-bottom: 6px;
+    }
+    .roadmap-phase .phase-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 12px;
+    }
+    .roadmap-phase ul {
+      list-style: none;
+      padding: 0;
+    }
+    .roadmap-phase ul li {
+      font-size: 12.5px;
+      color: var(--mid);
+      padding: 4px 0;
+      display: flex;
+      gap: 6px;
+    }
+    .roadmap-phase ul li::before { content: '→'; color: var(--green-mid); flex-shrink: 0; }
+
+    /* ── Slide notes (designer guidance) ── */
+    .slide-note {
+      background: #fefce8;
+      border: 1px dashed #fbbf24;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: #78350f;
+      margin: 12px 0;
+    }
+    .slide-note::before { content: '🎨 Slide Designer: '; font-weight: 700; }
+
+    /* ── CTA ── */
+    .cta-box {
+      background: linear-gradient(135deg, var(--dark) 0%, #064e3b 100%);
+      border-radius: 16px;
+      padding: 48px;
+      text-align: center;
+      color: #fff;
+      margin-top: 56px;
+    }
+    .cta-box h2 { font-size: 28px; font-weight: 900; margin-bottom: 12px; }
+    .cta-box p { color: rgba(255,255,255,.75); font-size: 15px; max-width: 540px; margin: 0 auto 24px; }
+    .cta-box .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .cta-btn {
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+    }
+    .cta-btn.primary { background: #10b981; color: #fff; }
+    .cta-btn.secondary { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.3); }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    /* ── Print ── */
+    @media print {
+      .print-btn { display: none !important; }
+      body { padding: 20px 28px; font-size: 12px; }
+      .cover { border-radius: 8px; padding: 36px 32px; }
+      .cover h1 { font-size: 28px; }
+      h2.sec { margin-top: 36px; page-break-before: auto; }
+      .feature-grid { grid-template-columns: 1fr 1fr 1fr; }
+      .revenue-grid { grid-template-columns: 1fr 1fr; }
+      .problem-grid { grid-template-columns: 1fr 1fr; }
+      .stat-bar { grid-template-columns: repeat(4, 1fr); }
+      .roadmap { grid-template-columns: repeat(3, 1fr); }
+      .slide-note { display: none; }
+      a { color: inherit; text-decoration: none; }
+      .cta-box { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">&#128438; Save as PDF</button>
+
+<!-- ═══ COVER ═══ -->
+<div class="cover">
+  <div class="tag">Government Proposal — Confidential</div>
+  <h1>The <span>Bodaboda Management</span><br>System</h1>
+  <p class="subtitle">A digital platform to register, track, and regulate motorcycle taxi operators across Kenya — bringing order, safety, and new county revenue to the bodaboda industry.</p>
+  <div class="meta-row">
+    <span class="meta-pill">Prepared June 2026</span>
+    <span class="meta-pill">County Government Proposal</span>
+    <span class="meta-pill">BMS v1.0</span>
+  </div>
+</div>
+
+<div class="slide-note">
+  Cover slide: dark green gradient background. Large bold title with a motorcycle/Kenya visual. Three key facts as sub-bullets. Government seal top left.
+</div>
+
+
+<!-- ═══ 1. THE PROBLEM ═══ -->
+<h2 class="sec"><span class="icon">⚠️</span> The Problem We Are Solving <span class="line"></span></h2>
+
+<p>Kenya has over <strong>2 million bodaboda motorcycles</strong> and the sector employs millions of young people. Yet today, most county governments manage this sector with paper registers, rubber stamps, and manual inspections. The result is a system that is slow, easy to cheat, and impossible to enforce.</p>
+
+<div class="stat-bar">
+  <div class="stat-card">
+    <div class="num">2M<span>+</span></div>
+    <div class="label">Bodabodas in Kenya</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">~70<span>%</span></div>
+    <div class="label">Operate without verified ID</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">Billions</div>
+    <div class="label">KES in uncollected levies annually</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">#1</div>
+    <div class="label">Road accident cause in Kenya</div>
+  </div>
+</div>
+
+<div class="problem-grid">
+  <div class="problem-card">
+    <div class="label">No Accountability</div>
+    <div class="text">When a rider commits a crime or causes an accident, there is no reliable way to trace them back to a registered owner. Victims have no recourse.</div>
+  </div>
+  <div class="problem-card">
+    <div class="label">Revenue Leakage</div>
+    <div class="text">Annual levies are collected in cash with no digital trail. Corruption and under-reporting mean counties collect a fraction of what they are owed.</div>
+  </div>
+  <div class="problem-card">
+    <div class="label">No Compliance Visibility</div>
+    <div class="text">Inspectors have no way to instantly verify whether a bike has valid insurance, a licenced rider, or a fitness certificate — without physical paperwork.</div>
+  </div>
+  <div class="problem-card">
+    <div class="label">Rider Welfare Gaps</div>
+    <div class="text">Riders injured on duty often have no formal record of employment or next-of-kin, making emergency response, insurance claims, and support nearly impossible.</div>
+  </div>
+</div>
+
+<div class="slide-note">
+  Slide 2: "The Problem" — use bold statistics in large type. Side-by-side with a photo of a busy Kenyan bodaboda stage (Pexels). Red accents on problem cards.
+</div>
+
+
+<!-- ═══ 2. THE SOLUTION ═══ -->
+<h2 class="sec"><span class="icon">💡</span> Our Solution — What BMS Does <span class="line"></span></h2>
+
+<p>The Bodaboda Management System is a <strong>fully digital government platform</strong> that every motorcycle owner and rider registers on once, then remains accountable through for life. Think of it as a <em>national ID system specifically for bodabodas</em> — combining registration, digital identity, annual levy collection, compliance tracking, and incident reporting all in one place.</p>
+
+<div class="compare-grid">
+  <div class="compare-card old">
+    <div class="label">Before BMS — Today</div>
+    <ul>
+      <li>Paper registration books that get lost or forged</li>
+      <li>Cash levy collection with no audit trail</li>
+      <li>No way to check if a rider is licenced on the spot</li>
+      <li>Accident victims cannot identify responsible parties</li>
+      <li>Inspectors rely on physical documents that can be faked</li>
+      <li>County has no data on how many bodabodas actually operate</li>
+      <li>Riders get no formal proof of registration or employment</li>
+    </ul>
+  </div>
+  <div class="compare-card new">
+    <div class="label">After BMS — With This System</div>
+    <ul>
+      <li>Every motorcycle and rider has a permanent digital record</li>
+      <li>Annual levies paid via M-Pesa, SalamaPay, or eCitizen — fully auditable</li>
+      <li>Any inspector scans a QR code to verify compliance instantly</li>
+      <li>Every motorcycle links to a named, traceable owner and rider</li>
+      <li>All documents stored digitally — forgery is eliminated</li>
+      <li>County gets real-time dashboards of the entire fleet</li>
+      <li>Every rider gets a printed digital ID card with their photo and QR code</li>
+    </ul>
+  </div>
+</div>
+
+<div class="slide-note">
+  Slide 3: "Before vs. After" — two-column split. Left column red/negative, right column green/positive. Strong visual contrast. Could animate as a reveal.
+</div>
+
+
+<!-- ═══ 3. FEATURES (LAYMAN'S TERMS) ═══ -->
+<h2 class="sec"><span class="icon">🛠️</span> Key Features — Explained Simply <span class="line"></span></h2>
+
+<div class="feature-grid">
+
+  <div class="feature-card">
+    <div class="icon">📋</div>
+    <div class="title">Digital Registration</div>
+    <div class="desc">Owners fill out a simple online form — like registering for an NHIF card but for their motorcycle. Their details, documents, and photos are stored permanently in a secure government database.</div>
+  </div>
+
+  <div class="feature-card">
+    <div class="icon">📱</div>
+    <div class="title">Phone Verification (OTP)</div>
+    <div class="desc">To prevent fake registrations, every owner confirms their identity by entering a one-time code sent to their mobile phone — the same way M-Pesa verifies transactions.</div>
+  </div>
+
+  <div class="feature-card">
+    <div class="icon">🪪</div>
+    <div class="title">Digital BMS Rider ID Card</div>
+    <div class="desc">Every registered rider receives a printable digital ID card — like a staff ID — showing their photo, name, unique BMS number, and a QR code. It can be shown on a phone or printed.</div>
+  </div>
+
+  <div class="feature-card">
+    <div class="icon">📷</div>
+    <div class="title">QR Code Verification (For Anyone)</div>
+    <div class="desc">Each registered motorcycle gets a QR code sticker. Any member of the public — or a traffic police officer — can scan it with a phone camera to instantly see if the bike and rider are legitimate and compliant.</div>
+  </div>
+
+  <div class="feature-card">
+    <div class="icon">💳</div>
+    <div class="title">Annual Levy Collection</div>
+    <div class="desc">Owners pay KES 350 per year and riders pay KES 100 — directly on the platform via M-Pesa, SalamaPay, or the Kenya eCitizen portal. Every payment is recorded, traceable, and goes directly to county revenue. No cash handled.</div>
+  </div>
+
+  <div class="feature-card">
+    <div class="icon">🗂️</div>
+    <div class="title">Document Storage</div>
+    <div class="desc">All critical documents — logbooks, insurance certificates, KRA PIN, driving licences, good conduct certificates — are uploaded and stored digitally. They can be verified instantly online, eliminating forgery.</div>
+  </div>
+
+  <div class="feature-card">
+    <div class="icon">⚠️</div>
+    <div class="title">Incident Reporting</div>
+    <div class="desc">If a bodaboda causes an accident, harasses someone, or is stolen, anyone can report it on the platform. The report is automatically linked to the registered owner and rider, creating a permanent record and triggering a government notification.</div>
+  </div>
+
+  <div class="feature-card">
+    <div class="icon">📍</div>
+    <div class="title">GPS Tracking (Optional)</div>
+    <div class="desc">For motorcycles fitted with a small GPS tracker (roughly the size of a lighter), the system can show their last known location on a map. This is critical for theft recovery and route compliance.</div>
+  </div>
+
+  <div class="feature-card">
+    <div class="icon">🧑‍💼</div>
+    <div class="title">Owner–Rider Assignment</div>
+    <div class="desc">A motorcycle owner who employs multiple riders can manage all of them on one account — assigning, removing, and tracking riders per motorcycle. This creates a formal employment record in the government database.</div>
+  </div>
+
+  <div class="feature-card">
+    <div class="icon">📊</div>
+    <div class="title">Admin Command Centre</div>
+    <div class="desc">County officials get a live dashboard showing every registered owner, motorcycle, rider, payment collected, and incident report — filterable and exportable. Like an air traffic control tower for bodabodas.</div>
+  </div>
+
+  <div class="feature-card">
+    <div class="icon">🔒</div>
+    <div class="title">Role-Based Access for Staff</div>
+    <div class="desc">Different county staff get different levels of access — clerks can register, managers can approve, and senior officials can view revenue reports. Every action by every official is automatically logged and cannot be tampered with.</div>
+  </div>
+
+  <div class="feature-card">
+    <div class="icon">🤖</div>
+    <div class="title">Auto ID Reading (OCR)</div>
+    <div class="desc">When registering, the system can read a photo of a national ID card and automatically fill in the applicant's name and ID number — saving time and reducing data entry errors.</div>
+  </div>
+
+</div>
+
+<div class="slide-note">
+  Slide 4–6: "Key Features" — 4 cards per slide across 3 slides. Each card with icon, bold title, and one plain-language sentence. Use a clean white card grid on light grey background.
+</div>
+
+
+<!-- ═══ 4. GOVERNMENT BENEFITS ═══ -->
+<h2 class="sec"><span class="icon">🏛️</span> Why This Is Good for Government <span class="line"></span></h2>
+
+<h3>Security &amp; Crime Reduction</h3>
+<div class="benefit-list">
+
+  <div class="benefit-item">
+    <div class="bullet">🔍</div>
+    <div class="content">
+      <div class="title">Instant Accountability for Every Motorcycle</div>
+      <div class="body">Every registered motorcycle is permanently linked to a named, phone-verified owner. If that motorcycle is involved in a crime, accident, or traffic offence, law enforcement can immediately identify the owner through the QR code — <strong>no more hit-and-run anonymity.</strong></div>
+    </div>
+  </div>
+
+  <div class="benefit-item">
+    <div class="bullet">🪪</div>
+    <div class="content">
+      <div class="title">Verified Rider Identity at Every Stage</div>
+      <div class="body">Every rider on the platform has submitted their national ID, photo, good conduct certificate, and driving licence — all stored and verified by the government. Criminals and unqualified riders cannot pass this process. <strong>This acts as a vetting mechanism the industry currently lacks entirely.</strong></div>
+    </div>
+  </div>
+
+  <div class="benefit-item">
+    <div class="bullet">🚨</div>
+    <div class="content">
+      <div class="title">Public Incident Reporting — A Community Watch</div>
+      <div class="body">Any citizen who witnesses dangerous riding, theft, harassment, or an accident can report it on the platform in seconds. The report is automatically linked to the motorcycle's registered owner and rider, <strong>creating a public safety net that currently does not exist.</strong> Repeat offenders accumulate a visible record.</div>
+    </div>
+  </div>
+
+  <div class="benefit-item">
+    <div class="bullet">📍</div>
+    <div class="content">
+      <div class="title">GPS Tracking for High-Risk Bikes</div>
+      <div class="body">For motorcycles designated as high-risk (repeat incidents, suspicious activity), the GPS tracking module allows county authorities to monitor location history, enforce route compliance for saccos, and assist police in theft recovery. <strong>A stolen bodaboda can be located on a map within minutes.</strong></div>
+    </div>
+  </div>
+
+  <div class="benefit-item">
+    <div class="bullet">🕵️</div>
+    <div class="content">
+      <div class="title">Tamper-Proof Audit Trail</div>
+      <div class="body">Every action taken by every county official — approvals, rejections, edits, payments received — is recorded in an audit log that cannot be deleted or modified. <strong>This eliminates the corruption risk</strong> of paper-based systems where records can conveniently disappear.</div>
+    </div>
+  </div>
+
+</div>
+
+<h3>Compliance &amp; Regulation</h3>
+<div class="benefit-list">
+
+  <div class="benefit-item">
+    <div class="bullet">✅</div>
+    <div class="content">
+      <div class="title">Automated Compliance Checking</div>
+      <div class="body">The system automatically flags motorcycles that are missing insurance, lack a registered rider, have an expired annual levy, or have incomplete documents. <strong>Inspectors no longer rely on what operators voluntarily show them</strong> — they scan the QR and the system shows the true compliance status instantly.</div>
+    </div>
+  </div>
+
+  <div class="benefit-item">
+    <div class="bullet">📅</div>
+    <div class="content">
+      <div class="title">Annual Levy Compliance — Automatic Alerts</div>
+      <div class="body">When a motorcycle owner or rider's annual registration fee expires, the system flags them immediately on the admin dashboard and sends them a reminder. <strong>No more chasing operators in the field</strong> — non-compliant operators are visible from the county office in real time.</div>
+    </div>
+  </div>
+
+  <div class="benefit-item">
+    <div class="bullet">📄</div>
+    <div class="content">
+      <div class="title">All Documents in One Place</div>
+      <div class="body">Insurance certificates, logbooks, KRA PINs, licences, and good conduct certificates are all stored in the government's database. <strong>Document forgery becomes much harder</strong> because county officials can cross-reference uploaded digital documents against the originals during any inspection or renewal.</div>
+    </div>
+  </div>
+
+  <div class="benefit-item">
+    <div class="bullet">🏢</div>
+    <div class="content">
+      <div class="title">SACCO and Stage Formalisation</div>
+      <div class="body">Every rider's SACCO membership, stage name, and county registration number is captured during onboarding. This gives county governments <strong>the first accurate picture of how bodaboda saccos are structured</strong> — essential for licensing, regulating routes, and engaging the organised sector.</div>
+    </div>
+  </div>
+
+</div>
+
+<h3>Rider Welfare</h3>
+<div class="benefit-list">
+
+  <div class="benefit-item">
+    <div class="bullet">🆔</div>
+    <div class="content">
+      <div class="title">Formal Identity and Employment Record</div>
+      <div class="body">For the first time, riders have a government-recognised digital identity card — their BMS ID — that proves they are a registered, vetted motorcycle taxi operator. <strong>This opens doors to formal financial services</strong> (bank accounts, mobile loans, insurance products) that currently exclude informal workers.</div>
+    </div>
+  </div>
+
+  <div class="benefit-item">
+    <div class="bullet">🚑</div>
+    <div class="content">
+      <div class="title">Emergency Response — Next of Kin on Record</div>
+      <div class="body">Every rider's next-of-kin name and phone number is stored in the system. If a rider is involved in an accident and is unconscious, <strong>hospitals and police can scan the BMS ID and immediately call the rider's family</strong> — something that currently costs lives due to delays in identifying victims.</div>
+    </div>
+  </div>
+
+  <div class="benefit-item">
+    <div class="bullet">⚖️</div>
+    <div class="content">
+      <div class="title">Appeals and Due Process</div>
+      <div class="body">When a rider is reported for an incident, the system gives them a <strong>formal right of appeal</strong> — they can upload evidence and provide their version of events. This protects honest riders from malicious or false reports, building trust between the sector and the government.</div>
+    </div>
+  </div>
+
+  <div class="benefit-item">
+    <div class="bullet">📈</div>
+    <div class="content">
+      <div class="title">Work History and Reputation</div>
+      <div class="body">Every assignment a rider has ever held — which motorcycle, which owner, from when to when — is permanently recorded. <strong>A reliable rider builds a verifiable track record</strong>, which can support applications for better-paying positions, insurance products, or government welfare programmes.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="slide-note">
+  Slides 7–10: Split into three slides — "Security", "Compliance", "Rider Welfare". Each benefit as a row with icon, bold headline, and two-sentence explanation. Green accent colour throughout.
+</div>
+
+
+<!-- ═══ 5. REVENUE MODELS ═══ -->
+<h2 class="sec"><span class="icon">💰</span> Revenue Models — How Government Earns <span class="line"></span></h2>
+
+<p>The platform is not just a cost to government — it is a <strong>revenue-generating asset</strong>. Below are all the ways county and national government can generate sustainable income from this system.</p>
+
+<div class="revenue-grid">
+
+  <div class="revenue-card">
+    <div class="header">
+      <div class="icon" style="background:#d1fae5">💳</div>
+      <div class="name">Annual Registration Levy</div>
+      <span class="badge badge-green">Core Revenue</span>
+    </div>
+    <div class="amount">KES 350 / KES 100</div>
+    <div class="desc">Every motorcycle owner pays KES 350 per year. Every rider pays KES 100 per year. With <strong>2 million registered motorcycles and 3 million riders</strong> nationally, levies alone generate <strong>KES 1B annually</strong> at full coverage — all collected digitally with zero cash handling.</div>
+  </div>
+
+  <div class="revenue-card">
+    <div class="header">
+      <div class="icon" style="background:#dbeafe">📄</div>
+      <div class="name">Registration &amp; Document Fees</div>
+      <span class="badge badge-blue">One-Time</span>
+    </div>
+    <div class="amount">KES 500 – 2,000</div>
+    <div class="desc">A one-time initial registration processing fee per owner or rider. Covers system onboarding, document verification, and BMS ID card issuance. This fee is standard practice for all government licensing and licensing renewals.</div>
+  </div>
+
+  <div class="revenue-card">
+    <div class="header">
+      <div class="icon" style="background:#fef3c7">🔄</div>
+      <div class="name">Replacement &amp; Reissuance Fees</div>
+      <span class="badge badge-amber">Recurring</span>
+    </div>
+    <div class="amount">KES 200 – 500</div>
+    <div class="desc">Fee for replacing a lost BMS ID card, re-printing a QR code sticker, or reissuing documents due to a change of motorcycle or name. These are frequent occurrences in a large, active fleet.</div>
+  </div>
+
+  <div class="revenue-card">
+    <div class="header">
+      <div class="icon" style="background:#d1fae5">🏢</div>
+      <div class="name">SACCO Bulk Registration</div>
+      <span class="badge badge-green">B2G / B2B</span>
+    </div>
+    <div class="amount">Negotiated per SACCO</div>
+    <div class="desc">SACCOs and stage management organisations can pay a bulk registration fee to register all their member riders at once through a dedicated channel, with a per-rider discount for volume. The SACCO also gets aggregate compliance reporting tools.</div>
+  </div>
+
+  <div class="revenue-card">
+    <div class="header">
+      <div class="icon" style="background:#fce7f3">💸</div>
+      <div class="name">Payment Gateway Commission</div>
+      <span class="badge badge-amber">Passive Income</span>
+    </div>
+    <div class="amount">0.5% – 2% per transaction</div>
+    <div class="desc">Negotiate a revenue-sharing arrangement with M-Pesa, SalamaPay, or eCitizen based on total transaction volume routed through the platform. At KES 1B in annual levies at full scale, even a 0.5% commission returns <strong>KES 5M+ per year</strong> in passive income with no additional effort.</div>
+  </div>
+
+  <div class="revenue-card">
+    <div class="header">
+      <div class="icon" style="background:#fef3c7">🔍</div>
+      <div class="name">Third-Party Verification API</div>
+      <span class="badge badge-amber">Developer / B2B</span>
+    </div>
+    <div class="amount">Per-query pricing</div>
+    <div class="desc">Insurance companies, banks, ride-hailing platforms, and lending services can pay per-query to verify a rider's BMS registration status via a secure API. This is already standard practice with NTSA and other government registries.</div>
+  </div>
+
+  <div class="revenue-card">
+    <div class="header">
+      <div class="icon" style="background:#d1fae5">📊</div>
+      <div class="name">Aggregate Data Licensing</div>
+      <span class="badge badge-green">Policy / Research</span>
+    </div>
+    <div class="amount">Annually negotiated</div>
+    <div class="desc">Anonymised, aggregate data on fleet size, SACCO membership, geographic distribution, and compliance rates can be licensed to urban planners, researchers, NGOs, and development partners. This data is valuable and currently does not exist in any structured form.</div>
+  </div>
+
+  <div class="revenue-card">
+    <div class="header">
+      <div class="icon" style="background:#fce7f3">⚠️</div>
+      <div class="name">Compliance Non-Compliance Fines</div>
+      <span class="badge badge-red">Enforcement</span>
+    </div>
+    <div class="amount">KES 10,000 per operator</div>
+    <div class="desc">Operators caught without a valid annual levy, incomplete documents, or an unregistered rider pay a KES 10,000 fine — issued digitally via the platform, payable via M-Pesa. <strong>Year 1 yields the highest fine revenue</strong> as compliance is lowest; revenue declines each year as the fleet becomes compliant, which is the intended outcome.</div>
+  </div>
+
+  <div class="revenue-card">
+    <div class="header">
+      <div class="icon" style="background:#fee2e2">🚔</div>
+      <div class="name">Traffic Offence Fines</div>
+      <span class="badge badge-red">High-Value Enforcement</span>
+    </div>
+    <div class="amount">KES 25,000 per offence</div>
+    <div class="desc">The BMS QR system enables officers to instantly link a traffic stop to a registered owner and rider, then issue a digital fine for no helmet, dangerous riding, overloading, operating without insurance, or an unverified QR sticker. At KES 25,000 per citation, this becomes the <strong>single largest enforcement revenue stream</strong> — growing year-on-year as QR scanning becomes standard police procedure.</div>
+  </div>
+
+  <div class="revenue-card">
+    <div class="header">
+      <div class="icon" style="background:#dbeafe">🏫</div>
+      <div class="name">County Replication (SaaS Licensing)</div>
+      <span class="badge badge-blue">Scale-Up</span>
+    </div>
+    <div class="amount">Per-county licence fee</div>
+    <div class="desc">Once deployed in one county, the platform can be white-labelled and licensed to other counties or national government at an annual software licence fee — creating a sustainable technology income stream and positioning the pioneering county as a digital governance leader.</div>
+  </div>
+
+</div>
+
+<div class="slide-note">
+  Slide 11: "Revenue Model" — 2-column card grid. Use a large "Total Potential Revenue" callout box highlighting the headline number. Emphasise that every shilling is digitally traced.
+</div>
+
+<div class="callout">
+  <strong>Headline Revenue Projection (National Scale — 2,000,000 Motorcycles / 3,000,000 Riders)</strong>
+  Annual registration levies alone (2M owners × KES 350 + 3M riders × KES 100) = <strong>KES 1B per year at full coverage</strong>. Adding registration fees, compliance fines, and traffic offence fines, the platform can realistically generate <strong>KES 3.25B per year nationally</strong> by Year 3 — with traffic enforcement becoming the dominant revenue driver as QR scanning is embedded in daily police operations.
+</div>
+
+
+<!-- ═══ 6. FINANCIAL PROJECTION ═══ -->
+<h2 class="sec"><span class="icon">📈</span> Illustrative Revenue Projection <span class="line"></span></h2>
+
+<p>The table below illustrates projected annual revenue for a national deployment with <strong>2,000,000 registered motorcycle owners and 3,000,000 riders</strong>, scaling from Year 1 (50% rollout) to Year 3 (full national coverage). Compliance fine projections decline year-on-year as the fleet becomes compliant — traffic offence fines grow as enforcement embeds QR verification into daily police operations.</p>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Revenue Stream</th>
+        <th>Year 1 — 50% Coverage<br><small style="font-weight:400;opacity:.7">Compliance: ~40%</small></th>
+        <th>Year 2 — 80% Coverage<br><small style="font-weight:400;opacity:.7">Compliance: ~70%</small></th>
+        <th>Year 3 — 100% Coverage<br><small style="font-weight:400;opacity:.7">Compliance: ~90%</small></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Owner Annual Levy (KES 350)</td>
+        <td>KES 350,000,000</td>
+        <td>KES 560,000,000</td>
+        <td>KES 700,000,000</td>
+      </tr>
+      <tr>
+        <td>Rider Annual Levy (KES 100)</td>
+        <td>KES 150,000,000</td>
+        <td>KES 240,000,000</td>
+        <td>KES 300,000,000</td>
+      </tr>
+      <tr>
+        <td>One-Time Registration Fees</td>
+        <td>KES 500,000,000</td>
+        <td>KES 300,000,000</td>
+        <td>KES 100,000,000</td>
+      </tr>
+      <tr style="background:#fef2f2">
+        <td>Compliance Non-Compliance Fines<br><small style="color:#94a3b8">60% → 30% → 10% non-compliant × KES 10,000</small></td>
+        <td style="color:#dc2626;font-weight:700">KES 480,000,000</td>
+        <td style="color:#d97706;font-weight:700">KES 240,000,000</td>
+        <td style="color:#059669;font-weight:700">KES 100,000,000</td>
+      </tr>
+      <tr style="background:#fef2f2">
+        <td>Traffic Offence Fines<br><small style="color:#94a3b8">2% → 4% → 6% citation rate × KES 25,000</small></td>
+        <td style="color:#dc2626;font-weight:700">KES 300,000,000</td>
+        <td style="color:#d97706;font-weight:700">KES 960,000,000</td>
+        <td style="color:#059669;font-weight:700">KES 1,800,000,000</td>
+      </tr>
+      <tr>
+        <td>API &amp; Data Licensing</td>
+        <td>KES 0</td>
+        <td>KES 15,000,000</td>
+        <td>KES 60,000,000</td>
+      </tr>
+      <tr class="highlight">
+        <td>SACCO Bulk Registrations</td>
+        <td>KES 30,000,000</td>
+        <td>KES 60,000,000</td>
+        <td>KES 90,000,000</td>
+      </tr>
+      <tr class="total-row">
+        <td>TOTAL PROJECTED REVENUE</td>
+        <td>KES 1,810,000,000</td>
+        <td>KES 2,375,000,000</td>
+        <td>KES 3,150,000,000</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="callout info">
+  <strong>How Fine Revenue Is Modelled — Compliance Likelihood</strong>
+  Non-compliance rates are highest in Year 1 because the system is new and operators have not yet adopted the annual levy habit. As the system matures and enforcement becomes routine, compliance rises sharply. <strong>Compliance fines are therefore a declining revenue stream</strong> — which is a deliberate outcome, not a flaw. <strong>Traffic offence fines move in the opposite direction</strong>: they grow as QR scanning is embedded in daily police operations, citation-to-payment rates improve, and the system's ability to identify and track repeat offenders strengthens.
+  <br><br>
+  Fine calculation methodology: Compliance fines = (non-compliant % × enrolled fleet) × 8–10% enforcement rate × KES 10,000. Traffic fines = enrolled fleet × citation rate (2% → 6%) × KES 25,000 average fine.
+</div>
+
+<div class="callout warning">
+  <strong>Note to Slide Designer</strong>
+  Totals are in KES billions. Format as "KES 1.81B / KES 2.38B / KES 3.15B" on summary slides. The compliance fine column should visually shift from red (Year 1) to green (Year 3) to illustrate the intended policy outcome. The traffic offence column should show the opposite gradient — growing from green to a larger green, signalling growing enforcement effectiveness.
+</div>
+
+
+<!-- ═══ 7. IMPLEMENTATION ROADMAP ═══ -->
+<h2 class="sec"><span class="icon">🗓️</span> Implementation Roadmap <span class="line"></span></h2>
+
+<p>The system is already built and tested. Deployment in a county can be completed in <strong>under 90 days</strong> from approval.</p>
+
+<div class="roadmap">
+  <div class="roadmap-phase" style="background:#f0fdf4">
+    <div class="phase-label">Phase 1 — Months 1–2</div>
+    <div class="phase-name">Setup &amp; Pilot</div>
+    <ul>
+      <li>Configure system for county branding</li>
+      <li>Train county data clerks and admin staff</li>
+      <li>Launch pilot registration at 2–3 bodaboda stages</li>
+      <li>Collect feedback and refine workflows</li>
+      <li>Set up payment channels (M-Pesa Paybill, eCitizen)</li>
+    </ul>
+  </div>
+  <div class="roadmap-phase" style="background:#fff">
+    <div class="phase-label">Phase 2 — Months 2–4</div>
+    <div class="phase-name">County-Wide Rollout</div>
+    <ul>
+      <li>Open registration to all sub-counties</li>
+      <li>Mass registration drives at all major stages</li>
+      <li>Issue QR code stickers to all registered bikes</li>
+      <li>Distribute BMS ID cards to all riders</li>
+      <li>Drive SACCO bulk registration campaigns</li>
+    </ul>
+  </div>
+  <div class="roadmap-phase" style="background:#f0fdf4">
+    <div class="phase-label">Phase 3 — Month 4 onwards</div>
+    <div class="phase-name">Enforcement &amp; Scale</div>
+    <ul>
+      <li>Equip traffic officers with QR scanning guide</li>
+      <li>Begin issuing digital non-compliance notices</li>
+      <li>Launch annual levy renewal cycle</li>
+      <li>Open API to insurance and financial partners</li>
+      <li>Present model to other counties for replication</li>
+    </ul>
+  </div>
+</div>
+
+<div class="slide-note">
+  Slide 13: "Roadmap" — three-column timeline. Use numbered phase labels and tick icons. End with "System is ready — implementation starts on day one of approval."
+</div>
+
+
+<!-- ═══ 8. WHY NOW ═══ -->
+<h2 class="sec"><span class="icon">⚡</span> Why Now &amp; Why This Approach <span class="line"></span></h2>
+
+<div class="benefit-list">
+  <div class="benefit-item">
+    <div class="bullet">🏗️</div>
+    <div class="content">
+      <div class="title">The System Is Already Built</div>
+      <div class="body">This is not a proposal to fund software development from scratch. <strong>The platform already exists, is fully functional, and has been tested end-to-end.</strong> The county does not carry technology risk. The investment is in deployment, training, and enforcement — not construction.</div>
+    </div>
+  </div>
+  <div class="benefit-item">
+    <div class="bullet">📱</div>
+    <div class="content">
+      <div class="title">Kenya Is Ready</div>
+      <div class="body">With M-Pesa penetration above 80% and smartphone ownership growing rapidly, <strong>the infrastructure to collect payments and verify QR codes digitally is already in every bodaboda rider's pocket.</strong> No new devices need to be issued to the public.</div>
+    </div>
+  </div>
+  <div class="benefit-item">
+    <div class="bullet">📜</div>
+    <div class="content">
+      <div class="title">Regulatory Tailwinds</div>
+      <div class="body">The National Transport and Safety Authority (NTSA) and the National Police Service have both called for better accountability in the bodaboda sector following high-profile crime incidents. <strong>This platform directly responds to those calls with a concrete, deployable solution.</strong></div>
+    </div>
+  </div>
+  <div class="benefit-item">
+    <div class="bullet">🥇</div>
+    <div class="content">
+      <div class="title">First-Mover Advantage for the County</div>
+      <div class="body">No county government in Kenya currently has a fully digital bodaboda management system at this level of completeness. The county that launches first <strong>sets the national standard, attracts development partner funding, and positions its leadership as digital governance champions.</strong></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ CTA ═══ -->
+<div class="cta-box">
+  <h2>Ready to Deploy in 90 Days</h2>
+  <p>The Bodaboda Management System is built, tested, and waiting for a county partner to make it official. Every day without this system is a day of uncollected revenue, unaccountable riders, and avoidable accidents.</p>
+  <div class="buttons">
+    <button class="cta-btn primary" onclick="window.print()">Download This Brief as PDF</button>
+    <button class="cta-btn secondary">Request a Live Demo</button>
+  </div>
+</div>
+
+<footer>
+  <span>Bodaboda Management System — Government Pitch Brief &nbsp;|&nbsp; Confidential</span>
+  <span>Prepared June 2026 &nbsp;|&nbsp; BMS v1.0</span>
+</footer>
+
+</body>
+</html>
