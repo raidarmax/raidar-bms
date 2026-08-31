@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Camera, CheckCircle2, AlertCircle, ArrowLeft, Loader2, ScanBarcode, User, Phone, CreditCard, Bike, Plus, RotateCcw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { sendOtp, verifyOtp } from '../lib/otp';
@@ -20,9 +20,9 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
   const [manualSerial, setManualSerial] = useState('');
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState('');
-  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const zxingReaderRef = useRef<any>(null);
+  const detectedRef = useRef(false);
 
   const [ownerName, setOwnerName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -40,39 +40,33 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
 
   const [detailsError, setDetailsError] = useState('');
 
-  const stopCamera = useCallback(() => {
+  const stopCamera = () => {
     if (zxingReaderRef.current) {
       try { zxingReaderRef.current.reset(); } catch {}
       zxingReaderRef.current = null;
     }
-    if (cameraStream) {
-      cameraStream.getTracks().forEach(t => t.stop());
-      setCameraStream(null);
-    }
     setScanning(false);
-  }, [cameraStream]);
+  };
 
   useEffect(() => {
     return () => {
       if (zxingReaderRef.current) { try { zxingReaderRef.current.reset(); } catch {} }
-      if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
     };
-  }, [cameraStream]);
+  }, []);
 
-  useEffect(() => {
-    if (!scanning || !cameraStream || !videoRef.current) return;
+  const startCamera = async () => {
+    setScanError('');
+    detectedRef.current = false;
 
-    const video = videoRef.current;
-    video.srcObject = cameraStream;
-    video.play().catch(() => {
-      setScanError('Unable to start camera preview.');
-      stopCamera();
-    });
+    if (!videoRef.current) {
+      setScanError('Camera element not ready. Please try again.');
+      return;
+    }
 
-    let cancelled = false;
+    setScanning(true);
 
-    import('@zxing/library').then((zxing) => {
-      if (cancelled) return;
+    try {
+      const zxing = await import('@zxing/library');
 
       const hints = new Map();
       hints.set(zxing.DecodeHintType.POSSIBLE_FORMATS, [
@@ -89,41 +83,37 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
       ]);
       hints.set(zxing.DecodeHintType.TRY_HARDER, true);
 
-      const reader = new zxing.BrowserMultiFormatReader(hints, 800);
+      const reader = new zxing.BrowserMultiFormatReader(hints, 500);
       zxingReaderRef.current = reader;
 
-      reader.decodeFromStream(cameraStream, video, (result) => {
-        if (cancelled) return;
-        if (result) {
-          const value = result.getText().trim();
-          if (value.length >= 6) {
-            cancelled = true;
-            handleBarcodeDetected(value);
+      const devices = await reader.listVideoInputDevices();
+      const rearCamera = devices.find(d =>
+        /back|rear|environment/i.test(d.label)
+      );
+      const deviceId = rearCamera?.deviceId || (devices.length > 0 ? devices[devices.length - 1].deviceId : undefined);
+
+      await reader.decodeFromVideoDevice(
+        deviceId ?? null,
+        videoRef.current!,
+        (result, _err) => {
+          if (detectedRef.current) return;
+          if (result) {
+            const value = result.getText().trim();
+            if (value.length >= 4) {
+              detectedRef.current = true;
+              handleBarcodeDetected(value);
+            }
           }
         }
-      });
-    }).catch(() => {
-      if (!cancelled) {
-        setScanError('Barcode scanner failed to load. Please enter the serial number manually.');
-        stopCamera();
+      );
+    } catch (err: any) {
+      const msg = err?.message || '';
+      if (/not allowed|permission|denied/i.test(msg)) {
+        setScanError('Camera access denied. Please allow camera permissions in your browser settings, then try again.');
+      } else {
+        setScanError('Unable to start barcode scanner. Please enter the serial number manually.');
       }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [scanning, cameraStream]);
-
-  const startCamera = async () => {
-    setScanError('');
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
-      });
-      setCameraStream(stream);
-      setScanning(true);
-    } catch {
-      setScanError('Unable to access camera. Please allow camera permissions or enter the serial manually.');
+      setScanning(false);
     }
   };
 
@@ -402,9 +392,9 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
 
             {/* Camera viewport */}
             <div className="relative rounded-2xl overflow-hidden bg-black aspect-[4/3] border border-slate-700">
+              <video ref={videoRef} className={`w-full h-full object-cover ${scanning ? '' : 'hidden'}`} autoPlay playsInline muted />
               {scanning ? (
                 <>
-                  <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted />
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="w-3/4 h-16 border-2 border-emerald-400 rounded-lg opacity-70" />
                   </div>
