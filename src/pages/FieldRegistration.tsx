@@ -22,8 +22,6 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
   const [scanError, setScanError] = useState('');
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const scanIntervalRef = useRef<number | null>(null);
   const zxingReaderRef = useRef<any>(null);
 
   const [ownerName, setOwnerName] = useState('');
@@ -43,10 +41,6 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
   const [detailsError, setDetailsError] = useState('');
 
   const stopCamera = useCallback(() => {
-    if (scanIntervalRef.current) {
-      clearInterval(scanIntervalRef.current);
-      scanIntervalRef.current = null;
-    }
     if (zxingReaderRef.current) {
       try { zxingReaderRef.current.reset(); } catch {}
       zxingReaderRef.current = null;
@@ -60,36 +54,25 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
 
   useEffect(() => {
     return () => {
-      if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
       if (zxingReaderRef.current) { try { zxingReaderRef.current.reset(); } catch {} }
       if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
     };
   }, [cameraStream]);
 
   useEffect(() => {
-    if (scanning && cameraStream && videoRef.current) {
-      const video = videoRef.current;
-      video.srcObject = cameraStream;
-      video.play().catch(() => {
-        setScanError('Unable to start camera preview.');
-        stopCamera();
-      });
-    }
-  }, [scanning, cameraStream]);
-
-  useEffect(() => {
-    if (!scanning || !cameraStream || !videoRef.current || !canvasRef.current) return;
+    if (!scanning || !cameraStream || !videoRef.current) return;
 
     const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    if (!ctx) return;
+    video.srcObject = cameraStream;
+    video.play().catch(() => {
+      setScanError('Unable to start camera preview.');
+      stopCamera();
+    });
 
-    let active = true;
-    let rafId: number;
+    let cancelled = false;
 
     import('@zxing/library').then((zxing) => {
-      if (!active) return;
+      if (cancelled) return;
 
       const hints = new Map();
       hints.set(zxing.DecodeHintType.POSSIBLE_FORMATS, [
@@ -98,63 +81,36 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
         zxing.BarcodeFormat.EAN_13,
         zxing.BarcodeFormat.EAN_8,
         zxing.BarcodeFormat.ITF,
+        zxing.BarcodeFormat.UPC_A,
+        zxing.BarcodeFormat.UPC_E,
+        zxing.BarcodeFormat.CODABAR,
         zxing.BarcodeFormat.QR_CODE,
+        zxing.BarcodeFormat.DATA_MATRIX,
       ]);
       hints.set(zxing.DecodeHintType.TRY_HARDER, true);
 
-      const reader = new zxing.MultiFormatReader();
-      reader.setHints(hints);
+      const reader = new zxing.BrowserMultiFormatReader(hints, 800);
       zxingReaderRef.current = reader;
 
-      const scan = () => {
-        if (!active) return;
-        if (video.readyState < 2) {
-          rafId = requestAnimationFrame(scan);
-          return;
-        }
-
-        const vw = video.videoWidth;
-        const vh = video.videoHeight;
-        if (vw === 0 || vh === 0) {
-          rafId = requestAnimationFrame(scan);
-          return;
-        }
-
-        canvas.width = vw;
-        canvas.height = vh;
-        ctx.drawImage(video, 0, 0, vw, vh);
-
-        try {
-          const luminanceSource = new zxing.HTMLCanvasElementLuminanceSource(canvas);
-          const binarizer = new zxing.HybridBinarizer(luminanceSource);
-          const bitmap = new zxing.BinaryBitmap(binarizer);
-          const result = reader.decode(bitmap);
-          if (result) {
-            const value = result.getText().trim();
-            if (value.length >= 8) {
-              active = false;
-              handleBarcodeDetected(value);
-              return;
-            }
+      reader.decodeFromStream(cameraStream, video, (result) => {
+        if (cancelled) return;
+        if (result) {
+          const value = result.getText().trim();
+          if (value.length >= 6) {
+            cancelled = true;
+            handleBarcodeDetected(value);
           }
-        } catch {
-          // NotFoundException - no barcode in this frame
         }
-
-        rafId = requestAnimationFrame(scan);
-      };
-
-      rafId = requestAnimationFrame(scan);
+      });
     }).catch(() => {
-      if (active) {
+      if (!cancelled) {
         setScanError('Barcode scanner failed to load. Please enter the serial number manually.');
         stopCamera();
       }
     });
 
     return () => {
-      active = false;
-      if (rafId) cancelAnimationFrame(rafId);
+      cancelled = true;
     };
   }, [scanning, cameraStream]);
 
@@ -184,8 +140,8 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
 
   const handleManualEntry = () => {
     const trimmed = manualSerial.trim();
-    if (trimmed.length < 6) {
-      setScanError('Serial number must be at least 6 digits');
+    if (trimmed.length < 4) {
+      setScanError('Serial number must be at least 4 characters');
       return;
     }
     setSerial(trimmed);
@@ -449,7 +405,6 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
               {scanning ? (
                 <>
                   <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted />
-                  <canvas ref={canvasRef} className="absolute w-0 h-0 overflow-hidden opacity-0 pointer-events-none" />
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="w-3/4 h-16 border-2 border-emerald-400 rounded-lg opacity-70" />
                   </div>
