@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera, CheckCircle2, AlertCircle, ArrowLeft, Loader2, ScanBarcode, User, Phone, CreditCard, Bike, Plus, RotateCcw } from 'lucide-react';
+import { Camera, CheckCircle2, AlertCircle, ArrowLeft, Loader2, ScanBarcode, User, Phone, CreditCard, Bike, Plus, RotateCcw, Type } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { sendOtp, verifyOtp } from '../lib/otp';
 
@@ -13,6 +13,14 @@ type ExistingOwner = {
   bike_count: number;
 };
 
+declare global {
+  interface Window {
+    BarcodeDetector?: new (opts?: { formats: string[] }) => {
+      detect(source: HTMLVideoElement | HTMLCanvasElement | ImageBitmap): Promise<Array<{ rawValue: string }>>;
+    };
+  }
+}
+
 export default function FieldRegistration({ onNavigate }: { onNavigate: (page: string) => void }) {
   const [step, setStep] = useState<Step>('scan');
   const [serial, setSerial] = useState('');
@@ -20,9 +28,13 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
   const [manualSerial, setManualSerial] = useState('');
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState('');
+  const [scanMethod, setScanMethod] = useState('');
   const videoRef = useRef<HTMLVideoElement>(null);
-  const zxingReaderRef = useRef<any>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const detectedRef = useRef(false);
+  const intervalsRef = useRef<number[]>([]);
+  const tesseractWorkerRef = useRef<any>(null);
 
   const [ownerName, setOwnerName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -40,80 +52,148 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
 
   const [detailsError, setDetailsError] = useState('');
 
-  const stopCamera = () => {
-    if (zxingReaderRef.current) {
-      try { zxingReaderRef.current.reset(); } catch {}
-      zxingReaderRef.current = null;
+  const cleanupScanner = () => {
+    intervalsRef.current.forEach(id => clearInterval(id));
+    intervalsRef.current = [];
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
     }
+    if (tesseractWorkerRef.current) {
+      try { tesseractWorkerRef.current.terminate(); } catch {}
+      tesseractWorkerRef.current = null;
+    }
+  };
+
+  const stopCamera = () => {
+    cleanupScanner();
     setScanning(false);
+    setScanMethod('');
   };
 
   useEffect(() => {
-    return () => {
-      if (zxingReaderRef.current) { try { zxingReaderRef.current.reset(); } catch {} }
-    };
+    return () => { cleanupScanner(); };
   }, []);
+
+  const captureFrame = (): HTMLCanvasElement | null => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas || video.readyState < 2) return null;
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
+    if (!vw || !vh) return null;
+    canvas.width = vw;
+    canvas.height = vh;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) return null;
+    ctx.drawImage(video, 0, 0, vw, vh);
+    return canvas;
+  };
+
+  const extractSerialFromOcrText = (text: string): string | null => {
+    const lines = text.split(/\n/);
+    for (const line of lines) {
+      const cleaned = line.replace(/[^0-9a-zA-Z]/g, '');
+      if (/^\d{8,15}$/.test(cleaned)) return cleaned;
+      const digitRun = cleaned.match(/\d{8,15}/);
+      if (digitRun) return digitRun[0];
+    }
+    const allDigits = text.replace(/[^0-9]/g, '');
+    if (allDigits.length >= 8 && allDigits.length <= 20) {
+      const match = allDigits.match(/\d{8,15}/);
+      if (match) return match[0];
+    }
+    return null;
+  };
 
   const startCamera = async () => {
     setScanError('');
+    setScanMethod('Starting camera...');
     detectedRef.current = false;
 
-    if (!videoRef.current) {
-      setScanError('Camera element not ready. Please try again.');
-      return;
-    }
-
-    setScanning(true);
-
     try {
-      const zxing = await import('@zxing/library');
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false,
+      });
+      streamRef.current = stream;
+      setScanning(true);
 
-      const hints = new Map();
-      hints.set(zxing.DecodeHintType.POSSIBLE_FORMATS, [
-        zxing.BarcodeFormat.CODE_128,
-        zxing.BarcodeFormat.CODE_39,
-        zxing.BarcodeFormat.EAN_13,
-        zxing.BarcodeFormat.EAN_8,
-        zxing.BarcodeFormat.ITF,
-        zxing.BarcodeFormat.UPC_A,
-        zxing.BarcodeFormat.UPC_E,
-        zxing.BarcodeFormat.CODABAR,
-        zxing.BarcodeFormat.QR_CODE,
-        zxing.BarcodeFormat.DATA_MATRIX,
-      ]);
-      hints.set(zxing.DecodeHintType.TRY_HARDER, true);
+      const video = videoRef.current!;
+      video.srcObject = stream;
+      await video.play();
 
-      const reader = new zxing.BrowserMultiFormatReader(hints, 500);
-      zxingReaderRef.current = reader;
+      const hasBarcodeApi = typeof window.BarcodeDetector !== 'undefined';
 
-      const devices = await reader.listVideoInputDevices();
-      const rearCamera = devices.find(d =>
-        /back|rear|environment/i.test(d.label)
-      );
-      const deviceId = rearCamera?.deviceId || (devices.length > 0 ? devices[devices.length - 1].deviceId : undefined);
+      if (hasBarcodeApi) {
+        setScanMethod('Barcode scanner active');
+        const detector = new window.BarcodeDetector!({
+          formats: ['code_128', 'code_39', 'ean_13', 'ean_8', 'itf', 'upc_a', 'upc_e', 'codabar', 'qr_code', 'data_matrix'],
+        });
 
-      await reader.decodeFromVideoDevice(
-        deviceId ?? null,
-        videoRef.current!,
-        (result, _err) => {
+        const barcodeInterval = window.setInterval(async () => {
           if (detectedRef.current) return;
-          if (result) {
-            const value = result.getText().trim();
-            if (value.length >= 4) {
-              detectedRef.current = true;
-              handleBarcodeDetected(value);
+          try {
+            const results = await detector.detect(video);
+            if (results.length > 0 && !detectedRef.current) {
+              const value = results[0].rawValue.trim();
+              if (value.length >= 4) {
+                detectedRef.current = true;
+                handleBarcodeDetected(value);
+              }
             }
+          } catch {}
+        }, 400);
+        intervalsRef.current.push(barcodeInterval);
+      } else {
+        setScanMethod('OCR reader active (no barcode API)');
+      }
+
+      let ocrBusy = false;
+      const ocrInterval = window.setInterval(async () => {
+        if (detectedRef.current || ocrBusy) return;
+        const canvas = captureFrame();
+        if (!canvas) return;
+
+        ocrBusy = true;
+        try {
+          if (!tesseractWorkerRef.current) {
+            const Tesseract = await import('tesseract.js');
+            const worker = await Tesseract.createWorker('eng');
+            await worker.setParameters({ tessedit_char_whitelist: '0123456789' });
+            tesseractWorkerRef.current = worker;
           }
+
+          const { data } = await tesseractWorkerRef.current.recognize(canvas);
+          if (detectedRef.current) return;
+
+          const found = extractSerialFromOcrText(data.text);
+          if (found) {
+            detectedRef.current = true;
+            handleBarcodeDetected(found);
+          }
+        } catch {} finally {
+          ocrBusy = false;
         }
-      );
+      }, 2000);
+      intervalsRef.current.push(ocrInterval);
+
+      if (hasBarcodeApi) {
+        setTimeout(() => {
+          if (!detectedRef.current && scanning) {
+            setScanMethod('Barcode + OCR active');
+          }
+        }, 4000);
+      }
     } catch (err: any) {
       const msg = err?.message || '';
       if (/not allowed|permission|denied/i.test(msg)) {
         setScanError('Camera access denied. Please allow camera permissions in your browser settings, then try again.');
       } else {
-        setScanError('Unable to start barcode scanner. Please enter the serial number manually.');
+        setScanError('Unable to access camera. Please enter the serial number manually.');
       }
       setScanning(false);
+      setScanMethod('');
     }
   };
 
@@ -330,6 +410,7 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
   };
 
   const handleReset = () => {
+    stopCamera();
     setStep('scan');
     setSerial('');
     setImei('');
@@ -387,16 +468,24 @@ export default function FieldRegistration({ onNavigate }: { onNavigate: (page: s
           <div className="space-y-4 mt-4">
             <div className="text-center">
               <h2 className="text-white text-lg font-semibold">Scan Tracker Barcode</h2>
-              <p className="text-slate-400 text-sm mt-1">Point camera at the serial number barcode on the tracker</p>
+              <p className="text-slate-400 text-sm mt-1">Point camera at the barcode or printed serial number</p>
             </div>
 
             {/* Camera viewport */}
             <div className="relative rounded-2xl overflow-hidden bg-black aspect-[4/3] border border-slate-700">
               <video ref={videoRef} className={`w-full h-full object-cover ${scanning ? '' : 'hidden'}`} autoPlay playsInline muted />
+              <canvas ref={canvasRef} className="hidden" />
               {scanning ? (
                 <>
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-3/4 h-16 border-2 border-emerald-400 rounded-lg opacity-70" />
+                    <div className="w-3/4 h-24 border-2 border-emerald-400 rounded-lg opacity-70">
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2">
+                        <p className="text-emerald-300/80 text-[10px] whitespace-nowrap flex items-center gap-1">
+                          <Type size={10} />
+                          {scanMethod || 'Initializing...'}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                   <button
                     onClick={stopCamera}
