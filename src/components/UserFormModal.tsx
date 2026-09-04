@@ -24,6 +24,7 @@ export default function UserFormModal({
   const [formData, setFormData] = useState({
     username: '',
     email: '',
+    phone_number: '',
     password: '',
     confirmPassword: '',
     full_name: '',
@@ -39,6 +40,7 @@ export default function UserFormModal({
       setFormData({
         username: user.username,
         email: user.email,
+        phone_number: user.phone_number || '',
         password: '',
         confirmPassword: '',
         full_name: user.full_name,
@@ -127,6 +129,7 @@ export default function UserFormModal({
         const updates: any = {
           username: formData.username,
           email: formData.email,
+          phone_number: formData.phone_number.trim() || null,
           full_name: formData.full_name,
           role_id: formData.role_id,
           is_active: formData.is_active,
@@ -163,6 +166,7 @@ export default function UserFormModal({
           .insert({
             username: formData.username,
             email: formData.email,
+            phone_number: formData.phone_number.trim() || null,
             password_hash: passwordHash,
             full_name: formData.full_name,
             role_id: formData.role_id,
@@ -285,20 +289,35 @@ export default function UserFormModal({
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Full Name *
-            </label>
-            <input
-              type="text"
-              value={formData.full_name}
-              onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-              className={`w-full px-4 py-3 border ${errors.full_name ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent`}
-              placeholder="John Doe"
-            />
-            {errors.full_name && (
-              <p className="text-red-500 text-sm mt-1">{errors.full_name}</p>
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Full Name *
+              </label>
+              <input
+                type="text"
+                value={formData.full_name}
+                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                className={`w-full px-4 py-3 border ${errors.full_name ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent`}
+                placeholder="John Doe"
+              />
+              {errors.full_name && (
+                <p className="text-red-500 text-sm mt-1">{errors.full_name}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                value={formData.phone_number}
+                onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                placeholder="+254 7xx xxx xxx"
+              />
+            </div>
           </div>
 
           <div>
